@@ -1,0 +1,3 @@
+#!/bin/bash
+
+openssl req -x509 -newkey rsa:2048 -keyout /mnt/stable/certs/domain.key -out /mnt/stable/certs/domain.crt -days 365 -subj '/CN=stable' -nodes

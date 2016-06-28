@@ -1,0 +1,76 @@
+#cloud-config
+coreos:
+  hostname: proxy
+  etcd2:
+    # generate a new token for each unique cluster from https://discovery.etcd.io/new?size=3
+    # specify the initial size of your cluster with ?size=X
+    discovery: https://discovery.etcd.io/43232ee60a8c158d98d6e827a5601cb4
+    # multi-region and multi-cloud deployments need to use $public_ipv4
+    advertise-client-urls: http://$private_ipv4:2379
+    initial-advertise-peer-urls: http://$private_ipv4:2380
+    # listen on both the official ports and the legacy ports
+    # legacy ports can be omitted if your application doesn't depend on them
+    listen-client-urls: http://0.0.0.0:2379
+    listen-peer-urls: http://$private_ipv4:2380
+  units:
+    - name: etcd2.service
+      command: start
+    - name: fleet.service
+      command: start
+    - name: haproxy.service
+      command: start
+      content: |
+        [Unit]
+        Description=HAProxy
+        After=docker.service
+
+        [Service]
+        TimeoutStartSec=0
+        ExecStartPre=-/usr/bin/docker kill haproxy
+        ExecStartPre=-/usr/bin/docker rm haproxy
+        ExecStartPre=/usr/bin/docker pull haproxy
+        ExecStart=/usr/bin/docker run -d -p 0.0.0.0:80:80 -p 0.0.0.0:443:443 -v /etc/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg --name haproxy1 haproxy
+        ExecStop=/usr/bin/docker stop haproxy1
+write_files:
+  - path: /etc/haproxy.cfg
+    permissions: 0644
+    owner: root
+    content: |
+      global
+           log         127.0.0.1 local2
+           maxconn     4096
+       defaults
+           balance roundrobin
+           mode http
+           log global
+           option httplog
+           option dontlognull
+           option forwardfor
+           option redispatch
+           retries                 3
+           timeout queue           1m
+           timeout connect         10s
+           timeout client          1m
+           timeout server          1m
+           timeout http-keep-alive 10s
+           timeout check           10s
+           maxconn                 2000
+       frontend http
+           bind *:80
+           bind *:443
+           default_backend host_web
+           acl host_git hdr(host) -i git.flowercluster.io
+           use_backend git if host_git
+       backend host_web
+           http-request set-header X-Forwarded-Port %[dst_port]
+           server web1 10.0.1.0:80 check
+           server web2 10.0.1.1:80 check
+           server web3 10.0.1.2:80 check
+       backend host_stable
+           http-request set-header X-Forwarded-Port %[dst_port]
+           server stable1 10.0.2.0:80
+       backend git
+           http-request set-header X-Forwarded-Port %[dst_port]
+           server stable1 10.0.2.1:3000 check
+           server stable2 10.0.2.2:3000 check
+           server stable3 10.0.2.3:3000 check
