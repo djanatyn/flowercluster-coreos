@@ -7,12 +7,12 @@ the goal is an entirely reproducible, fault-tolerant, mostly stateless distribut
 
 ---
 
-there are four main nodes: proxy, web, stable, and development.
+there are four main nodes: `proxy`, `web`, `stable`, and `development`.
 
-- the proxy nodes grab IPs from the public subnet (10.0.3.0/24) and recieve requests hitting flowercluster.io. requests are routed based on the port number or 'Host' header to the web nodes and the stable node. it's storage is entirely ephemeral, only running haproxy. 
+- the `proxy` nodes grab IPs from the public subnet (`10.0.3.0/24`) and recieve requests hitting flowercluster.io. requests are routed based on the port number or 'Host' header to the web nodes and the stable node. it's storage is entirely ephemeral, only running haproxy. 
 
-- the web nodes runs nginx and routes HTTP requests to containers running web applications, based on their 'Host' parameter. they are entirely stateless and do not attach any persistent volumes.
+- the `web` nodes runs nginx and routes HTTP requests to containers running web applications, based on their 'Host' parameter. they are entirely stateless and do not attach any persistent volumes.
 
-- the stable node is intended to be running at all times - it runs the docker registry, holds the code in git, runs monitoring, and several other essential services. an ext4 GCS drive is mounted as /var/lib/docker to keep the images and containers consistent across new instances.
+- the `stable` node is intended to be running at all times - it runs the docker registry, holds the code in git, runs monitoring, and several other essential services. an ext4 GCS drive is mounted as `/var/lib/docker` to keep the images and containers consistent across new instances.
 
-- the development node launches a fedora rawhide development server with user accounts created and some development packages installed. a GCS ext4 volume is mounted as /home/ and is consistent across new instances.
+- the `development` node launches a fedora rawhide development server with user accounts created and some development packages installed. an ext4 GCS drive is is mounted as `/home/` and is consistent across new instances.
