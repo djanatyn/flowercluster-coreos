@@ -1,0 +1,71 @@
+#cloud-config
+coreos:
+  hostname: development
+  etcd2:
+    # generate a new token for each unique cluster from https://discovery.etcd.io/new?size=3
+    # specify the initial size of your cluster with ?size=X
+    discovery: https://discovery.etcd.io/43232ee60a8c158d98d6e827a5601cb4
+    # multi-region and multi-cloud deployments need to use $public_ipv4
+    advertise-client-urls: http://$private_ipv4:2379
+    initial-advertise-peer-urls: http://$private_ipv4:2380
+    # listen on both the official ports and the legacy ports
+    # legacy ports can be omitted if your application doesn't depend on them
+    listen-client-urls: http://0.0.0.0:2379
+    listen-peer-urls: http://$private_ipv4:2380
+  units:
+    - name: var-lib-docker.mount
+      command: start
+      content: |
+        [Unit]
+        Description=mount persistent drive to /var/lib/docker
+        [Mount]
+        What=/dev/disk/by-id/google-development-docker
+        Where=/var/lib/docker
+        Type=ext4
+    - name: docker.service
+      drop-ins:
+        - name: 10-wait-docker.conf
+          content: |
+            [Unit]
+            After=var-lib-docker.mount
+            Requires=var-lib-docker.mount
+    - name: etcd2.service
+      command: start
+    - name: fleet.service
+      command: start
+    - name: development.service
+      command: start
+      content: |
+        [Unit]
+        After=docker.service
+
+        [Service]
+        RestartSec=10s
+        Restart=on-failure
+        ExecStartPre=-/usr/bin/docker kill development1
+        ExecStartPre=-/usr/bin/docker rm development1
+        ExecStart=/usr/bin/docker run --net host --name development1 -p 3000:3000 -p 3001:22 -v /home stable:5000/development /bin/bash -c 'while :; do sleep 1; done'
+        ExecStop=/usr/bin/docker stop -t 2 development1
+write_files:
+  - path: /etc/docker/certs.d/stable:5000/domain.crt
+    permissions: 0644
+    owner: root
+    content: |
+      -----BEGIN CERTIFICATE-----
+      MIIC9TCCAd2gAwIBAgIJAKja90lZnlL3MA0GCSqGSIb3DQEBCwUAMBExDzANBgNV
+      BAMMBnN0YWJsZTAeFw0xNjA2MjgwNzM5MDVaFw0xNzA2MjgwNzM5MDVaMBExDzAN
+      BgNVBAMMBnN0YWJsZTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALvD
+      +dgNBGwFPR6B2LodkzyOFnUrJBp9XXvfkHK68lOPNx0xmer+kaL1Dkm4vvLBpMa4
+      lgarv3fFhUub5fmjV+SOQf3Ql0Io/KMEg8kUY1Qxl+A42G3Zd1D5XDvWPEFLGApk
+      4VYNpIoatNXV5ua01CQfZNpyTkoR/34qGEU04IjMWxTu9hkujR2vb0UVcj0Fc4mU
+      ElQEXoqo8I+ku+AiSZLfUg6A6PrLWzyhd5C4aLu/vw1ear0h9+JWJYNJ/JRsey6R
+      VvoyLF7XI8Q4I9C9O9YoWNB6ISSfMdmR2Vjq1Ncq0da25i9kyogedS+ngejewsfl
+      Ki9UfnZj4ghLi1bg/tUCAwEAAaNQME4wHQYDVR0OBBYEFArqen0DaC5D/Iu4/G7X
+      x6AHl1KcMB8GA1UdIwQYMBaAFArqen0DaC5D/Iu4/G7Xx6AHl1KcMAwGA1UdEwQF
+      MAMBAf8wDQYJKoZIhvcNAQELBQADggEBAK6tSg7ttR6aw9nRnRsC7ufSXjbhIJ9Q
+      P1Rn0OkKM2Y0zLxxT1m3y3PAe4Snl0a9NrrKZ4uhFlipZ+N6w4/Xt5r+qIyIAiKt
+      qCTpagvtMvmFdwcT6mPVWQvAlpC64oPisu2zcpKTJFePbVUzk+W2MGfhNMlKjQsr
+      u4k6dy5e2Wk8M0jVppYl7iPnwJSBh/dZinlJf82MlVAyK1cjJhb1m0AWw/Q2Lk3j
+      V3oWRW1R/As9CPzGnnNoHZ2yEqyHJwbHQL5Y5whV79iopIUH6E0SQVBMDDw5Poli
+      aaw3qX0fvDia1vi6Bb7LeMe4N3MCt/4aBlILfzDQWE4+shYGoORNh9Y=
+      -----END CERTIFICATE-----
