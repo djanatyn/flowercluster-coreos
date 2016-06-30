@@ -6,4 +6,5 @@ gcloud compute instances create development --zone us-central1-b \
   --metadata-from-file user-data=development.yml \
   --disk name=development-docker,device-name=development-docker \
   --subnet private \
+  --tag development \
   --image https://www.googleapis.com/compute/v1/projects/coreos-cloud/global/images/coreos-alpha-1081-2-0-v20160627
