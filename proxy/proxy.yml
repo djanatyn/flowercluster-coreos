@@ -26,8 +26,10 @@ coreos:
         Conflicts=sshd.service
 
         [Socket]
+        ExecStartPre=/usr/bin/sleep 20
         ListenStream=2222
         FreeBind=true
+        ReusePort=true
         Accept=yes
 
         [Install]
@@ -96,7 +98,7 @@ write_files:
           server stable2 10.0.2.2:3000 check
           server stable3 10.0.2.3:3000 check
 
-      frontend sshd
+      frontend gogs_sshd
           bind *:1234
           mode tcp
           default_backend ssh_gogs
