@@ -91,7 +91,7 @@ coreos:
 
         [Socket]
         ExecStartPre=/usr/bin/sleep 20
-        ListenStream=22222
+        ListenStream=2222
         ReusePort=true
         FreeBind=true
         Accept=yes
