@@ -46,7 +46,7 @@ coreos:
         ExecStartPre=-/usr/bin/docker kill haproxy1
         ExecStartPre=-/usr/bin/docker rm haproxy1
         ExecStartPre=/usr/bin/docker pull haproxy
-        ExecStartPre=/usr/bin/docker run -p 0.0.0.0:1234:1234 -p 0.0.0.0:80:80 -p 0.0.0.0:443:443 -v /etc/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg --name haproxy1 haproxy
+        ExecStartPre=/usr/bin/docker run -p 1234:1234 -p 22:22 -p 80:80 -p 443:443 -v /etc/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg --name haproxy1 haproxy
         ExecStart=/usr/bin/docker start haproxy1
         ExecStop=/usr/bin/docker stop haproxy1
 write_files:
@@ -122,6 +122,6 @@ write_files:
       backend ssh_development
           mode tcp
 
-          server development1 10.0.2.1:22 check port 2222
-          server development2 10.0.2.2:22 check port 2222
-          server development3 10.0.2.3:22 check port 2222
+          server development1 10.0.2.1:2222 check port 2222
+          server development2 10.0.2.2:2222 check port 2222
+          server development3 10.0.2.3:2222 check port 2222
