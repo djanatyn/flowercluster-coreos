@@ -68,3 +68,53 @@ coreos:
         ExecStartPre=-/usr/bin/docker rm gogs1
         ExecStart=/usr/bin/docker run --name gogs1 -p 3000:3000 -p 3001:22 -v gogs-data:/data gogs/gogs
         ExecStop=/usr/bin/docker stop -t 2 gogs
+    - name: development.service
+      command: start
+      content: |
+        [Unit]
+        After=docker.service
+
+        [Service]
+        RestartSec=10s
+        Restart=on-failure
+        ExecStartPre=-/usr/bin/docker kill development1
+        ExecStartPre=-/usr/bin/docker rm development1
+        ExecStart=/usr/bin/docker run --net host --name development1 -v home-data:/home stable:5000/development /usr/sbin/sshd -D
+        ExecStop=/usr/bin/docker stop -t 2 development1
+    - name: sshd.socket
+      command: restart
+      runtime: true
+      content: |
+        [Unit]
+        Description=OpenSSH ServerSocket
+        Conflicts=sshd.service
+
+        [Socket]
+        ExecStartPre=/usr/bin/sleep 20
+        ListenStream=22222
+        ReusePort=true
+        FreeBind=true
+        Accept=yes
+write_files:
+  - path: /etc/docker/certs.d/stable:5000/domain.crt
+    permissions: 0644
+    owner: root
+    content: |
+      -----BEGIN CERTIFICATE-----
+      MIIC9TCCAd2gAwIBAgIJAKja90lZnlL3MA0GCSqGSIb3DQEBCwUAMBExDzANBgNV
+      BAMMBnN0YWJsZTAeFw0xNjA2MjgwNzM5MDVaFw0xNzA2MjgwNzM5MDVaMBExDzAN
+      BgNVBAMMBnN0YWJsZTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALvD
+      +dgNBGwFPR6B2LodkzyOFnUrJBp9XXvfkHK68lOPNx0xmer+kaL1Dkm4vvLBpMa4
+      lgarv3fFhUub5fmjV+SOQf3Ql0Io/KMEg8kUY1Qxl+A42G3Zd1D5XDvWPEFLGApk
+      4VYNpIoatNXV5ua01CQfZNpyTkoR/34qGEU04IjMWxTu9hkujR2vb0UVcj0Fc4mU
+      ElQEXoqo8I+ku+AiSZLfUg6A6PrLWzyhd5C4aLu/vw1ear0h9+JWJYNJ/JRsey6R
+      VvoyLF7XI8Q4I9C9O9YoWNB6ISSfMdmR2Vjq1Ncq0da25i9kyogedS+ngejewsfl
+      Ki9UfnZj4ghLi1bg/tUCAwEAAaNQME4wHQYDVR0OBBYEFArqen0DaC5D/Iu4/G7X
+      x6AHl1KcMB8GA1UdIwQYMBaAFArqen0DaC5D/Iu4/G7Xx6AHl1KcMAwGA1UdEwQF
+      MAMBAf8wDQYJKoZIhvcNAQELBQADggEBAK6tSg7ttR6aw9nRnRsC7ufSXjbhIJ9Q
+      P1Rn0OkKM2Y0zLxxT1m3y3PAe4Snl0a9NrrKZ4uhFlipZ+N6w4/Xt5r+qIyIAiKt
+      qCTpagvtMvmFdwcT6mPVWQvAlpC64oPisu2zcpKTJFePbVUzk+W2MGfhNMlKjQsr
+      u4k6dy5e2Wk8M0jVppYl7iPnwJSBh/dZinlJf82MlVAyK1cjJhb1m0AWw/Q2Lk3j
+      V3oWRW1R/As9CPzGnnNoHZ2yEqyHJwbHQL5Y5whV79iopIUH6E0SQVBMDDw5Poli
+      aaw3qX0fvDia1vi6Bb7LeMe4N3MCt/4aBlILfzDQWE4+shYGoORNh9Y=
+      -----END CERTIFICATE-----
