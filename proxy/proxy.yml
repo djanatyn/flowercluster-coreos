@@ -21,10 +21,17 @@ coreos:
       command: restart
       runtime: true
       content: |
+        [Unit]
+        Description=OpenSSH Server Socket
+        Conflicts=sshd.service
+
         [Socket]
         ListenStream=2222
         FreeBind=true
         Accept=yes
+
+        [Install]
+        WantedBy=sockets.target
     - name: haproxy.service
       command: start
       content: |
@@ -103,3 +110,16 @@ write_files:
           server ssh_gogs2 10.0.2.2:3001 check port 3001
           server ssh_gogs3 10.0.2.3:3001 check port 3001
 
+      frontend development_sshd
+          bind *:22
+          mode tcp
+          default_backend ssh_development
+
+          timeout client 1h
+
+      backend ssh_development
+          mode tcp
+
+          server ssh_gogs1 10.0.2.1:22 check port 22
+          server ssh_gogs2 10.0.2.2:22 check port 22
+          server ssh_gogs3 10.0.2.3:22 check port 22
