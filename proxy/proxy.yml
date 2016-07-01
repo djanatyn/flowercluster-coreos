@@ -122,6 +122,6 @@ write_files:
       backend ssh_development
           mode tcp
 
-          server ssh_gogs1 10.0.2.1:22 check port 22
-          server ssh_gogs2 10.0.2.2:22 check port 22
-          server ssh_gogs3 10.0.2.3:22 check port 22
+          server development1 10.0.2.1:22 check port 2222
+          server development2 10.0.2.2:22 check port 2222
+          server development3 10.0.2.3:22 check port 2222

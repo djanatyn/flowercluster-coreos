@@ -33,13 +33,6 @@ coreos:
       command: start
     - name: fleet.service
       command: start
-    - name: mnt-stable.mount
-      command: start
-      content: |
-        [Mount]
-        What=/dev/disk/by-id/google-stable-persistent
-        Where=/mnt/stable
-        Type=ext3
     - name: registry.service
       command: start
       content: |
@@ -52,7 +45,7 @@ coreos:
         Restart=on-failure
         ExecStartPre=-/usr/bin/docker kill registry1
         ExecStartPre=-/usr/bin/docker rm registry1
-        ExecStart=/usr/bin/docker run -p 5000:5000 --name registry1 registry:2
+      ExecStart=/usr/bin/docker run -d -p 5000:5000 -v registry-data:/var/lib/registry -v registry-certs:/certs -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key --name registry1 registry:2
         ExecStop=/usr/bin/docker stop -t 2 registry1
     - name: gogs.service
       command: start
@@ -79,22 +72,8 @@ coreos:
         Restart=on-failure
         ExecStartPre=-/usr/bin/docker kill development1
         ExecStartPre=-/usr/bin/docker rm development1
-        ExecStart=/usr/bin/docker run --net host --name development1 -v home-data:/home stable:5000/development /usr/sbin/sshd -D
+        ExecStart=/usr/bin/docker run --name development1 -v home-data:/home -p 2222:22 stable:5000/development /usr/sbin/sshd -D
         ExecStop=/usr/bin/docker stop -t 2 development1
-    - name: sshd.socket
-      command: restart
-      runtime: true
-      content: |
-        [Unit]
-        Description=OpenSSH ServerSocket
-        Conflicts=sshd.service
-
-        [Socket]
-        ExecStartPre=/usr/bin/sleep 20
-        ListenStream=2222
-        ReusePort=true
-        FreeBind=true
-        Accept=yes
 write_files:
   - path: /etc/docker/certs.d/stable:5000/domain.crt
     permissions: 0644
