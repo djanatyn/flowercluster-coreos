@@ -46,7 +46,7 @@ coreos:
         ExecStartPre=-/usr/bin/docker kill haproxy1
         ExecStartPre=-/usr/bin/docker rm haproxy1
         ExecStartPre=/usr/bin/docker pull haproxy
-        ExecStartPre=/usr/bin/docker run -p 1234:1234 -p 22:22 -p 80:80 -p 443:443 -v /etc/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg --name haproxy1 haproxy
+        ExecStartPre=/usr/bin/docker run --net host -v /etc/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg --name haproxy1 haproxy
         ExecStart=/usr/bin/docker start haproxy1
         ExecStop=/usr/bin/docker stop haproxy1
 write_files:
@@ -70,7 +70,7 @@ write_files:
           timeout queue           1m
           timeout connect         10s
           timeout client          1m
-          timeout server          1m
+          timeout server          1h
           timeout http-keep-alive 10s
           timeout check           10s
           maxconn                 2000
@@ -78,7 +78,7 @@ write_files:
       frontend http
           bind *:80
           bind *:443
-          default_backend host_web
+          default_backend host_stable
           acl host_git hdr(host) -i git.flowercluster.io
           use_backend git if host_git
 
@@ -90,13 +90,11 @@ write_files:
 
       backend host_stable
           http-request set-header X-Forwarded-Port %[dst_port]
-          server stable1 10.0.2.0:80
+          server stable1 stable:80
 
       backend git
           http-request set-header X-Forwarded-Port %[dst_port]
-          server stable1 10.0.2.1:3000 check
-          server stable2 10.0.2.2:3000 check
-          server stable3 10.0.2.3:3000 check
+          server gogs_git1 stable:3000 check
 
       frontend gogs_sshd
           bind *:1234
@@ -105,12 +103,22 @@ write_files:
 
           timeout client 1h
 
+      frontend irc
+          bind *:6667
+          mode tcp
+          default_backend stable_ircd
+
+          timeout client 1h
+
+      backend stable_ircd
+          mode tcp
+
+          server stable_ircd1 stable:6667 check port 6667
+
       backend ssh_gogs
           mode tcp
 
-          server ssh_gogs1 10.0.2.1:3001 check port 3001
-          server ssh_gogs2 10.0.2.2:3001 check port 3001
-          server ssh_gogs3 10.0.2.3:3001 check port 3001
+          server ssh_gogs1 stable:3001 check port 3001
 
       frontend development_sshd
           bind *:22
@@ -122,6 +130,26 @@ write_files:
       backend ssh_development
           mode tcp
 
-          server development1 10.0.2.1:2222 check port 2222
-          server development2 10.0.2.2:2222 check port 2222
-          server development3 10.0.2.3:2222 check port 2222
+          server development1 stable:2222 check port 2222
+  - path: /etc/docker/certs.d/stable:5000/domain.crt
+    permissions: 0644
+    owner: root
+    content: |
+      -----BEGIN CERTIFICATE-----
+      MIIC9TCCAd2gAwIBAgIJAKja90lZnlL3MA0GCSqGSIb3DQEBCwUAMBExDzANBgNV
+      BAMMBnN0YWJsZTAeFw0xNjA2MjgwNzM5MDVaFw0xNzA2MjgwNzM5MDVaMBExDzAN
+      BgNVBAMMBnN0YWJsZTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALvD
+      +dgNBGwFPR6B2LodkzyOFnUrJBp9XXvfkHK68lOPNx0xmer+kaL1Dkm4vvLBpMa4
+      lgarv3fFhUub5fmjV+SOQf3Ql0Io/KMEg8kUY1Qxl+A42G3Zd1D5XDvWPEFLGApk
+      4VYNpIoatNXV5ua01CQfZNpyTkoR/34qGEU04IjMWxTu9hkujR2vb0UVcj0Fc4mU
+      ElQEXoqo8I+ku+AiSZLfUg6A6PrLWzyhd5C4aLu/vw1ear0h9+JWJYNJ/JRsey6R
+      VvoyLF7XI8Q4I9C9O9YoWNB6ISSfMdmR2Vjq1Ncq0da25i9kyogedS+ngejewsfl
+      Ki9UfnZj4ghLi1bg/tUCAwEAAaNQME4wHQYDVR0OBBYEFArqen0DaC5D/Iu4/G7X
+      x6AHl1KcMB8GA1UdIwQYMBaAFArqen0DaC5D/Iu4/G7Xx6AHl1KcMAwGA1UdEwQF
+      MAMBAf8wDQYJKoZIhvcNAQELBQADggEBAK6tSg7ttR6aw9nRnRsC7ufSXjbhIJ9Q
+      P1Rn0OkKM2Y0zLxxT1m3y3PAe4Snl0a9NrrKZ4uhFlipZ+N6w4/Xt5r+qIyIAiKt
+      qCTpagvtMvmFdwcT6mPVWQvAlpC64oPisu2zcpKTJFePbVUzk+W2MGfhNMlKjQsr
+      u4k6dy5e2Wk8M0jVppYl7iPnwJSBh/dZinlJf82MlVAyK1cjJhb1m0AWw/Q2Lk3j
+      V3oWRW1R/As9CPzGnnNoHZ2yEqyHJwbHQL5Y5whV79iopIUH6E0SQVBMDDw5Poli
+      aaw3qX0fvDia1vi6Bb7LeMe4N3MCt/4aBlILfzDQWE4+shYGoORNh9Y=
+      -----END CERTIFICATE-----
