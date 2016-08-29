@@ -1,9 +1,12 @@
-FROM fedora-ansible:latest
+FROM stable:5000/fedora-ansible:latest
 
-ADD ./vault_pass /tmp/vault_pass
+ADD ./vault_pass /root/vault_pass
 
-RUN git clone https://github.com/djanatyn/zubkoland.git /var/local/zubkoland
-RUN chown -R ansible:ansible /var/local/zubkoland
+RUN git clone https://github.com/djanatyn/flowercluster-development.git /var/local/ansible
+RUN chown -R ansible:ansible /var/local/ansible
 
-RUN ansible-galaxy install -r /var/local/zubkoland/requirements.yml
-RUN cd /var/local/zubkoland && ansible-playbook --vault-password-file=/tmp/vault_pass setup.yml
+RUN ansible-galaxy install -r /var/local/ansible/requirements.yml
+RUN cd /var/local/ansible && ansible-playbook --vault-password-file=/root/vault_pass setup.yml && rm /root/vault_pass
+
+RUN dnf install openssh-server
+RUN ssh-keygen -A
