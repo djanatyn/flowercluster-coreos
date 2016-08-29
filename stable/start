@@ -1,7 +1,7 @@
 #!/bin/bash
 
 gcloud compute instances delete stable
-gcloud compute instances create stable --zone us-central1-b \
+gcloud compute instances create stable \
   --machine-type n1-standard-1 \
   --metadata-from-file user-data=stable.yml \
   --disk name=stable-docker,device-name=stable-docker \
