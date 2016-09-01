@@ -45,7 +45,6 @@ coreos:
         TimeoutStartSec=0
         ExecStartPre=-/usr/bin/docker kill haproxy1
         ExecStartPre=-/usr/bin/docker rm haproxy1
-        ExecStartPre=/usr/bin/docker pull stable:5000/haproxy
         ExecStartPre=/usr/bin/docker run --net host --name haproxy1 stable:5000/haproxy-flowercluster
         ExecStart=/usr/bin/docker start haproxy1
         ExecStop=/usr/bin/docker stop haproxy1

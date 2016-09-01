@@ -1,3 +1,3 @@
 FROM haproxy:latest
 
-ADD ./haproxy.cfg /etc/haproxy.cfg
+ADD ./haproxy.cfg /usr/local/etc/haproxy/haproxy.cfg
