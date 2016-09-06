@@ -4,7 +4,7 @@ dnf install -y git sudo python-pip clang python-devel redhat-rpm-config openssl-
 
 useradd -r -M -U ansible
 
-mkdir /var/local/zubkoland
-chown -R ansible:ansible /var/local/zubkoland
+mkdir /var/local/ansible
+chown -R ansible:ansible /var/local/ansible
 
 pip install ansible
