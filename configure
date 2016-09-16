@@ -13,7 +13,7 @@ logger.setLevel(logging.INFO)
 
 
 def write_json(instance):
-    """ Write JSON for a instanceuration to file. """
+    """ Write JSON for a instance to file. """
 
     template = {'ignition': {'version': '2.0.0'}}
     template.update(instance['config'])
