@@ -1,0 +1,11 @@
+[Unit]
+Description=gogs
+After=docker.service
+
+[Service]
+RestartSec=10s
+Restart=on-failure
+ExecStartPre=-/usr/bin/docker kill gogs1
+ExecStartPre=-/usr/bin/docker rm gogs1
+ExecStart=/usr/bin/docker run --name gogs1 -p 3000:3000 -p 3001:22 -v gogs-data:/data stable:5000/flowercluster-gogs
+ExecStop=/usr/bin/docker stop -t 2 gogs

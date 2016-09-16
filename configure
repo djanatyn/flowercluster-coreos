@@ -1,0 +1,40 @@
+#!/usr/bin/env python
+
+import json
+import sys
+import logging
+from instances import configuration
+
+log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+logging.basicConfig(format=log_format)
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+
+def write_json(instance):
+    """ Write JSON for a instanceuration to file. """
+
+    template = {'ignition': {'version': '2.0.0'}}
+    template.update(instance['config'])
+
+    logger.info("writing config for `{0}` to '{1}'".format(
+        instance['name'], instance['filename']))
+
+    with open(instance['filename'], 'w') as f:
+        json.dump(template, f)
+
+
+def main():
+    """ Create ignition json for each instance. """
+
+    logger.info('starting!')
+
+    for instance in configuration:
+        write_json(instance)
+
+    logger.info('success!')
+
+
+if __name__ == '__main__':
+    main()
