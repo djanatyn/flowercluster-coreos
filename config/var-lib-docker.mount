@@ -1,6 +1,0 @@
-[Unit]
-Description=mount persistent drive to /var/lib/docker
-[Mount]
-What=/dev/disk/by-id/google-stable-docker
-Where=/var/lib/docker
-Type=ext4
