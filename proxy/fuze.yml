@@ -18,7 +18,7 @@ systemd:
             --listen-client-urls=http://0.0.0.0:2379 \
             --listen-peer-urls=http://${COREOS_GCE_IP_EXTERNAL_0}:2380 \
             --discovery=https://discovery.etcd.io/6254d174b0ca958abd15d35b98a9fd60
-    - name: fleet.service
+    - name: docker.service
       enable: True
     - name: sshd.socket
       enable: True
