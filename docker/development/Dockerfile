@@ -10,3 +10,8 @@ RUN ssh-keygen -A
 
 RUN ansible-galaxy install -r /var/local/ansible/requirements.yml
 RUN cd /var/local/ansible && ansible-playbook --vault-password-file=/root/vault_pass setup.yml && chmod a-rwx /root/vault_pass
+
+RUN pip install supervisor
+COPY supervisord.conf /etc/supervisord.conf
+
+CMD ["/usr/bin/supervisord"]
