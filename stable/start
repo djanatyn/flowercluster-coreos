@@ -3,8 +3,8 @@
 gcloud compute instances delete stable
 gcloud compute instances create stable \
   --machine-type n1-standard-1 \
-  --metadata-from-file user-data=stable.yml \
+  --metadata-from-file user-data=ignition.json \
   --disk name=stable-docker,device-name=stable-docker \
-  --subnet private \
+  --network default \
   --tag stable \
   --image https://www.googleapis.com/compute/v1/projects/coreos-cloud/global/images/coreos-alpha-1081-2-0-v20160627

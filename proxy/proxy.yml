@@ -1,26 +1,28 @@
-#cloud-config
-coreos:
-  hostname: proxy
-  etcd2:
-    # generate a new token for each unique cluster from https://discovery.etcd.io/new?size=3
-    # specify the initial size of your cluster with ?size=X
-    discovery: https://discovery.etcd.io/43232ee60a8c158d98d6e827a5601cb4
-    # multi-region and multi-cloud deployments need to use $public_ipv4
-    advertise-client-urls: http://$private_ipv4:2379
-    initial-advertise-peer-urls: http://$private_ipv4:2380
-    # listen on both the official ports and the legacy ports
-    # legacy ports can be omitted if your application doesn't depend on them
-    listen-client-urls: http://0.0.0.0:2379
-    listen-peer-urls: http://$private_ipv4:2380
+---
+systemd:
   units:
     - name: etcd2.service
-      command: start
-    - name: fleet.service
-      command: start
+      enable: True
+      dropins:
+        - name: metadata.conf
+          contents: |
+            [Unit]
+            Requires=coreos-metadata.service
+            After=coreos-metadata.service
+            [Service]
+            EnvironmentFile=/run/metadata/coreos
+            ExecStart=
+            ExecStart=/usr/bin/etcd2 \
+            --advertise-client-urls=http://${COREOS_GCE_IP_EXTERNAL_0}:2379 \
+            --initial-advertise-peer-urls=http://${COREOS_GCE_IP_EXTERNAL_0}:2380 \
+            --listen-client-urls=http://0.0.0.0:2379 \
+            --listen-peer-urls=http://${COREOS_GCE_IP_EXTERNAL_0}:2380 \
+            --discovery=https://discovery.etcd.io/6254d174b0ca958abd15d35b98a9fd60
+    - name: docker.service
+      enable: True
     - name: sshd.socket
-      command: restart
-      runtime: true
-      content: |
+      enable: True
+      contents: |
         [Unit]
         Description=OpenSSH Server Socket
         Conflicts=sshd.service
@@ -35,8 +37,8 @@ coreos:
         [Install]
         WantedBy=sockets.target
     - name: haproxy.service
-      command: start
-      content: |
+      enable: True
+      contents: |
         [Unit]
         Description=HAProxy
         After=docker.service
@@ -48,26 +50,30 @@ coreos:
         ExecStartPre=/usr/bin/docker run --net host --name haproxy1 stable:5000/haproxy-flowercluster
         ExecStart=/usr/bin/docker start haproxy1
         ExecStop=/usr/bin/docker stop haproxy1
-write_files:
-  - path: /etc/docker/certs.d/stable:5000/domain.crt
-    permissions: 0644
-    owner: root
-    content: |
-      -----BEGIN CERTIFICATE-----
-      MIIC9TCCAd2gAwIBAgIJAMxqwLP3h2pQMA0GCSqGSIb3DQEBCwUAMBExDzANBgNV
-      BAMMBnN0YWJsZTAeFw0xNjA4MjQxNzUyMjJaFw0xNzA4MjQxNzUyMjJaMBExDzAN
-      BgNVBAMMBnN0YWJsZTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMTU
-      Ir19HetCT5C+uX+qJnw3InBIMk05uJJTeBWWVBTvvVKmEtrwtRtGts0ue4dYQhpm
-      72gy3zerg8/GQM3QGuNfkVtdtcNhp7kHFT7sAjv+C2/ZnEl0oBkT2VoRCePT6ydu
-      kMXVMaA7lpZAIcKkZ13aiCG2cMrlpAg6Lo44Dy+vJCBoY2LnJkrgV2FpIIPLFdQ6
-      OVEkLKDWQNfIVv5ljwP5PDKs38IdYfQpnmGnd7pOp8Aao18FyiR+rST0wlKNY+Fv
-      egANIwQrYJwYBQDKuASaxGHSF4DXrJidHUCcbkS2xAl5ohHM3lAl+Lu4/iq6BZLf
-      sftkP87U/9qMTVud35sCAwEAAaNQME4wHQYDVR0OBBYEFJxKekgur5Jjwh00BgWq
-      blLyBNfNMB8GA1UdIwQYMBaAFJxKekgur5Jjwh00BgWqblLyBNfNMAwGA1UdEwQF
-      MAMBAf8wDQYJKoZIhvcNAQELBQADggEBAHSRLCMmHMK4SyqPweleaq5/FRcE2aqs
-      3Tmk7YWNRAC8V2Dly3oQrp0YBcr+T9AiXcMJVaPBwPTzIpfA6hsMgj2HVmzHk4xi
-      615tuGjufGQlEsYy1sUQsgUNWBk8bLTZsM4ZVEKPxnDzp5aZKV7jlFLlWhnlwS+C
-      mtaP0b9blrl3qE1XPts/eKlivtlzWGpnfbWGZngKqVj9UmdmgZH0C3y6UqeQjLAG
-      IBXI6Kf7uuUMtAGZnQH8rKs66ecpIXHLegZ9Xg3N1cgRpU62BraTqrhATWGoy8F5
-      rdkh7KPIcGQwoySbmVEhHJxiXN9TdQkxq5hEPlUbqmspWO/oRT/sMuk=
-      -----END CERTIFICATE-----
+storage:
+  files:
+    - path: /etc/docker/certs.d/stable:5000/domain.crt
+      filesystem: root
+      mode: 0644
+      user:
+        id: 0
+      contents:
+        inline: |
+          -----BEGIN CERTIFICATE-----
+          MIIC9TCCAd2gAwIBAgIJAMxqwLP3h2pQMA0GCSqGSIb3DQEBCwUAMBExDzANBgNV
+          BAMMBnN0YWJsZTAeFw0xNjA4MjQxNzUyMjJaFw0xNzA4MjQxNzUyMjJaMBExDzAN
+          BgNVBAMMBnN0YWJsZTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMTU
+          Ir19HetCT5C+uX+qJnw3InBIMk05uJJTeBWWVBTvvVKmEtrwtRtGts0ue4dYQhpm
+          72gy3zerg8/GQM3QGuNfkVtdtcNhp7kHFT7sAjv+C2/ZnEl0oBkT2VoRCePT6ydu
+          kMXVMaA7lpZAIcKkZ13aiCG2cMrlpAg6Lo44Dy+vJCBoY2LnJkrgV2FpIIPLFdQ6
+          OVEkLKDWQNfIVv5ljwP5PDKs38IdYfQpnmGnd7pOp8Aao18FyiR+rST0wlKNY+Fv
+          egANIwQrYJwYBQDKuASaxGHSF4DXrJidHUCcbkS2xAl5ohHM3lAl+Lu4/iq6BZLf
+          sftkP87U/9qMTVud35sCAwEAAaNQME4wHQYDVR0OBBYEFJxKekgur5Jjwh00BgWq
+          blLyBNfNMB8GA1UdIwQYMBaAFJxKekgur5Jjwh00BgWqblLyBNfNMAwGA1UdEwQF
+          MAMBAf8wDQYJKoZIhvcNAQELBQADggEBAHSRLCMmHMK4SyqPweleaq5/FRcE2aqs
+          3Tmk7YWNRAC8V2Dly3oQrp0YBcr+T9AiXcMJVaPBwPTzIpfA6hsMgj2HVmzHk4xi
+          615tuGjufGQlEsYy1sUQsgUNWBk8bLTZsM4ZVEKPxnDzp5aZKV7jlFLlWhnlwS+C
+          mtaP0b9blrl3qE1XPts/eKlivtlzWGpnfbWGZngKqVj9UmdmgZH0C3y6UqeQjLAG
+          IBXI6Kf7uuUMtAGZnQH8rKs66ecpIXHLegZ9Xg3N1cgRpU62BraTqrhATWGoy8F5
+          rdkh7KPIcGQwoySbmVEhHJxiXN9TdQkxq5hEPlUbqmspWO/oRT/sMuk=
+          -----END CERTIFICATE-----
