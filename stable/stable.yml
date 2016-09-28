@@ -45,7 +45,7 @@ coreos:
         Restart=on-failure
         ExecStartPre=-/usr/bin/docker kill registry1
         ExecStartPre=-/usr/bin/docker rm registry1
-        ExecStart=/usr/bin/docker run -d -p 5000:5000 -v registry-data:/var/lib/registry -v registry-certs:/certs -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key --name registry1 registry:2
+        ExecStart=/usr/bin/docker run -p 5000:5000 -v registry-data:/var/lib/registry -v registry-certs:/certs -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key --name registry1 registry:2
         ExecStop=/usr/bin/docker stop -t 2 registry1
     - name: gogs.service
       command: start
@@ -59,7 +59,7 @@ coreos:
         Restart=on-failure
         ExecStartPre=-/usr/bin/docker kill gogs1
         ExecStartPre=-/usr/bin/docker rm gogs1
-        ExecStart=/usr/bin/docker run --name gogs1 -d -p 3000:3000 -p 3001:22 -v gogs-data:/data stable:5000/flowercluster-gogs
+        ExecStart=/usr/bin/docker run --name gogs1 -p 3000:3000 -p 3001:22 -v gogs-data:/data stable:5000/flowercluster-gogs
         ExecStop=/usr/bin/docker stop -t 2 gogs
     - name: development.service
       command: start
@@ -72,7 +72,7 @@ coreos:
         Restart=on-failure
         ExecStartPre=-/usr/bin/docker kill development1
         ExecStartPre=-/usr/bin/docker rm development1
-        ExecStart=/usr/bin/docker run -d --name development1 -v home-data:/home -p 2222:22 stable:5000/development
+        ExecStart=/usr/bin/docker run --name development1 -v home-data:/home -p 2222:22 stable:5000/development
         ExecStop=/usr/bin/docker stop -t 2 development1
 write_files:
   - path: /etc/docker/certs.d/stable:5000/domain.crt
