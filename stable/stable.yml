@@ -18,11 +18,22 @@ systemd:
             --listen-client-urls=http://0.0.0.0:2379 \
             --listen-peer-urls=http://${COREOS_GCE_IP_EXTERNAL_0}:2380 \
             --discovery=https://discovery.etcd.io/6254d174b0ca958abd15d35b98a9fd60
+    - name: format-stable-docker.service
+      enable: True
+      contents: |
+        [Unit]
+        Description=Formats the docker persistent drive
+        [Service]
+        Type=oneshot
+        RemainAfterExit=yes
+        ExecStart=/usr/bin/bash -c 'if [ "$(blkid -s TYPE -o value /dev/disk/by-id/google-stable-docker)" != "ext4" ]; then /usr/sbin/mkfs.ext4 /dev/disk/by-id/google-stable-docker; fi'
     - name: var-lib-docker.mount
       enable: True
       contents: |
         [Unit]
         Description=mount persistent drive to /var/lib/docker
+        After=format-stable-docker.service
+        Requires=format-stable-docker.service
         [Mount]
         What=/dev/disk/by-id/google-stable-docker
         Where=/var/lib/docker
@@ -103,9 +114,3 @@ storage:
           IBXI6Kf7uuUMtAGZnQH8rKs66ecpIXHLegZ9Xg3N1cgRpU62BraTqrhATWGoy8F5
           rdkh7KPIcGQwoySbmVEhHJxiXN9TdQkxq5hEPlUbqmspWO/oRT/sMuk=
           -----END CERTIFICATE-----
-  filesystems:
-    - mount:
-        device: '/dev/disk/by-id/google-stable-docker'
-        format: 'ext4'
-        create:
-          force: false
