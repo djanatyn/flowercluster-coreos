@@ -7,4 +7,4 @@ gcloud compute instances create stable \
   --disk name=stable-docker,device-name=stable-docker \
   --network default \
   --tag stable \
-  --image https://www.googleapis.com/compute/v1/projects/coreos-cloud/global/images/coreos-alpha-1081-2-0-v20160627
+  --image https://www.googleapis.com/compute/v1/projects/coreos-cloud/global/images/coreos-alpha-1185-0-0-v20160928
