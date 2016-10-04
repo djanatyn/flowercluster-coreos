@@ -46,6 +46,9 @@ systemd:
             [Unit]
             After=var-lib-docker.mount
             Requires=var-lib-docker.mount
+            Wants=registry.service
+            Wants=gogs.service
+            Wants=development.service
     - name: registry.service
       enable: True
       contents: |
@@ -114,3 +117,15 @@ storage:
           IBXI6Kf7uuUMtAGZnQH8rKs66ecpIXHLegZ9Xg3N1cgRpU62BraTqrhATWGoy8F5
           rdkh7KPIcGQwoySbmVEhHJxiXN9TdQkxq5hEPlUbqmspWO/oRT/sMuk=
           -----END CERTIFICATE-----
+    - path: /opt/bin/docker-compose
+      filesystem: root
+      mode: 0755
+      user:
+        id: 0
+      contents:
+        remote:
+          url: https://github.com/docker/compose/releases/download/1.8.0/docker-compose-Linux-x86_64
+          verification:
+            hash:
+              function: 'sha512'
+              sum: 'b608b8c20d30e344797a5e5ab06e4ba4f3358a84b039924b09757cc04a96352d3cf0f360c239925ac5144bf9017c81c19f4ebe100bb75824698fc16b335cd9db'
