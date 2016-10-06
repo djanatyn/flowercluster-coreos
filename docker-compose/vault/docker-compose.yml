@@ -1,0 +1,15 @@
+vault:
+  image: stable:5000/vault
+  container_name: vault1
+  volumes:
+    - ./vault.hcl:/vault/config/vault.hcl
+    - vault-backend:/vault/file
+  ports:
+    - 8200:8200
+  cap_add:
+    - IPC_LOCK
+  command: "server"
+
+volumes:
+  vault-backend:
+    driver: local
