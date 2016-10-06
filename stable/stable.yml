@@ -38,6 +38,15 @@ systemd:
         What=/dev/disk/by-id/google-stable-docker
         Where=/var/lib/docker
         Type=ext4
+    - name: clone-flowercluster.service
+      enable: True
+      contents: |
+        [Unit]
+        Description=Fetches flowercluster repository
+        [Service]
+        Type=oneshot
+        RemainAfterExit=yes
+        ExecStart=/usr/bin/git clone https://github.com/djanatyn/flowercluster.git /opt/flowercluster
     - name: docker.service
       enable: True
       dropins:
