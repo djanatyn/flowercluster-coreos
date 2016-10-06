@@ -49,7 +49,7 @@ systemd:
         [Service]
         Type=oneshot
         RemainAfterExit=yes
-        ExecStart=/usr/bin/git clone https://github.com/djanatyn/flowercluster.git /opt/flowercluster
+        ExecStart=/usr/bin/git clone -b vault https://github.com/djanatyn/flowercluster.git /opt/flowercluster
     - name: docker.service
       enable: True
       dropins:
