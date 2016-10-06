@@ -56,9 +56,9 @@ systemd:
         [Unit]
         Description=hashicorp vault
         After=docker.service
-        WorkingDirectory=/opt/flowercluster/docker-compose/vault
 
         [Service]
+        WorkingDirectory=/opt/flowercluster/docker-compose/vault
         RestartSec=10s
         Restart=on-failure
         ExecStartPre=-/opt/bin/docker-compose kill vault
