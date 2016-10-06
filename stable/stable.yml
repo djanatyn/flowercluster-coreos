@@ -43,6 +43,9 @@ systemd:
       contents: |
         [Unit]
         Description=Fetches flowercluster repository
+        Wants=registry.service
+        Wants=gogs.service
+        Wants=development.service
         [Service]
         Type=oneshot
         RemainAfterExit=yes
@@ -55,9 +58,7 @@ systemd:
             [Unit]
             After=var-lib-docker.mount
             Requires=var-lib-docker.mount
-            Wants=registry.service
-            Wants=gogs.service
-            Wants=development.service
+            Requires=clone-flowercluster.service
     - name: registry.service
       enable: True
       contents: |
