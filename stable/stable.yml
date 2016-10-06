@@ -34,6 +34,7 @@ systemd:
         Description=mount persistent drive to /var/lib/docker
         After=format-stable-docker.service
         Requires=format-stable-docker.service
+
         [Mount]
         What=/dev/disk/by-id/google-stable-docker
         Where=/var/lib/docker
@@ -43,13 +44,27 @@ systemd:
       contents: |
         [Unit]
         Description=Fetches flowercluster repository
-        Wants=registry.service
-        Wants=gogs.service
-        Wants=development.service
+        Wants=vault.service
+
         [Service]
         Type=oneshot
         RemainAfterExit=yes
         ExecStart=/usr/bin/git clone -b vault https://github.com/djanatyn/flowercluster.git /opt/flowercluster
+    - name: vault.service
+      enable: True
+      contents: |
+        [Unit]
+        Description=hashicorp vault
+        After=docker.service
+        WorkingDirectory=/opt/flowercluster/docker-compose/vault
+
+        [Service]
+        RestartSec=10s
+        Restart=on-failure
+        ExecStartPre=-/opt/bin/docker-compose kill vault
+        ExecStartPre=-/opt/bin/docker-compose rm vault
+        ExecStart=/opt/bin/docker-compose up -d
+        ExecStop=/opt/bin/docker-compose stop
     - name: docker.service
       enable: True
       dropins:
@@ -59,12 +74,15 @@ systemd:
             After=var-lib-docker.mount
             Requires=var-lib-docker.mount
             Requires=clone-flowercluster.service
+            Wants=registry.service
+            Wants=gogs.service
+            Wants=development.service
     - name: registry.service
       enable: True
       contents: |
         [Unit]
         Description=Registry
-        After=docker.service
+        After=vault.service
 
         [Service]
         RestartSec=10s
