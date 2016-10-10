@@ -49,7 +49,8 @@ systemd:
         [Service]
         Type=oneshot
         RemainAfterExit=yes
-        ExecStart=-/usr/bin/git clone -b vault https://github.com/djanatyn/flowercluster.git /opt/flowercluster
+        ConditionPathExists=!/opt/flowercluster
+        ExecStart=/usr/bin/git clone -b vault https://github.com/djanatyn/flowercluster.git /opt/flowercluster
     - name: vault.service
       enable: True
       contents: |
@@ -59,12 +60,10 @@ systemd:
 
         [Service]
         WorkingDirectory=/opt/flowercluster/docker-compose/vault
-        RestartSec=10s
-        Restart=on-failure
-        ExecStartPre=-/opt/bin/docker-compose kill vault
-        ExecStartPre=-/opt/bin/docker-compose rm vault
-        ExecStart=/opt/bin/docker-compose up -d
+        Type=oneshot
+        RemainAfterExit=yes
         ExecStop=/opt/bin/docker-compose stop
+        ExecStart=/opt/bin/docker-compose up -d
     - name: docker.service
       enable: True
       dropins:
