@@ -18,6 +18,18 @@ systemd:
             --listen-client-urls=http://0.0.0.0:2379 \
             --listen-peer-urls=http://${COREOS_GCE_IP_EXTERNAL_0}:2380 \
             --discovery=https://discovery.etcd.io/6254d174b0ca958abd15d35b98a9fd60
+    - name: unzip-vault.service
+      enable: True
+      contents: |
+        [Unit]
+        ConditionFirstBoot=yes
+
+        [Service]
+        Type=oneshot
+        ExecStart=/usr/bin/unzip /tmp/vault.zip -d /opt/bin/
+        
+        [Install]
+        WantedBy=multi-user.target
     - name: format-stable-docker.service
       enable: True
       contents: |
@@ -156,3 +168,15 @@ storage:
             hash:
               function: 'sha512'
               sum: 'b608b8c20d30e344797a5e5ab06e4ba4f3358a84b039924b09757cc04a96352d3cf0f360c239925ac5144bf9017c81c19f4ebe100bb75824698fc16b335cd9db'
+    - path: /tmp/vault.zip
+      filesystem: root
+      mode: 0644
+      user:
+        id: 0
+      contents:
+        remote:
+          url: https://releases.hashicorp.com/vault/0.6.2/vault_0.6.2_linux_amd64.zip
+          verification:
+            hash:
+              function: 'sha512'
+              sum: '5a37ad553d38849a5a91568ce03d23abf668850049b3d550a5309a1acc391347156d09e08c8115599654c19a7c67856aa6776ac939a34440a095eb35cc47de37'
