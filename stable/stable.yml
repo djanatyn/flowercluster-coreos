@@ -26,7 +26,7 @@ systemd:
 
         [Service]
         Type=oneshot
-        ExecStart=/usr/bin/unzip /tmp/vault.zip -d /opt/bin/
+        ExecStart=/usr/bin/unzip /opt/vault.zip -d /opt/bin/
         
         [Install]
         WantedBy=multi-user.target
@@ -168,7 +168,7 @@ storage:
             hash:
               function: 'sha512'
               sum: 'b608b8c20d30e344797a5e5ab06e4ba4f3358a84b039924b09757cc04a96352d3cf0f360c239925ac5144bf9017c81c19f4ebe100bb75824698fc16b335cd9db'
-    - path: /tmp/vault.zip
+    - path: /opt/vault.zip
       filesystem: root
       mode: 0644
       user:
