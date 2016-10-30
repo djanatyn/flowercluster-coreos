@@ -156,6 +156,18 @@ storage:
           IBXI6Kf7uuUMtAGZnQH8rKs66ecpIXHLegZ9Xg3N1cgRpU62BraTqrhATWGoy8F5
           rdkh7KPIcGQwoySbmVEhHJxiXN9TdQkxq5hEPlUbqmspWO/oRT/sMuk=
           -----END CERTIFICATE-----
+    - path: /opt/bin/habitus
+      filesystem: root
+      mode: 0755
+      user:
+        id: 0
+      contents:
+        remote:
+          url: https://github.com/cloud66/habitus/releases/download/v0.4.7/habitus_linux_amd64
+          verification:
+            hash:
+              function: 'sha512'
+              sum: '9d7ed3f2312b3e8ae1c53bd6b73eb88c21f8f4b94b96c0b55823fb25906a757899b116f872cd1b29dba824621be25e88616c31f4723b255abb1824c2f8d0e3e8'
     - path: /opt/bin/docker-compose
       filesystem: root
       mode: 0755
