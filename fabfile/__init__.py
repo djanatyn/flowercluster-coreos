@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 
-import json
-import yaml
-import os
+import string
 from functools import wraps
 
 from config import load_config
 
-from fabric.api import task, run, abort, cd, put, prefix, hide
+import yaml
+from fabric.api import task, run, prefix, hide, local
 from fabric_gce_tools import update_roles_gce
 
 config = load_config()
@@ -44,25 +43,37 @@ def auth_vault():
 
 
 @task
-def registry_certs():
-    """ Update registry certs. """
+def launch_instance():
+    """ Launch flowercluster instance. """
 
-    output = run("docker volume inspect registry-certs", quiet=True)
-
-    if output.failed:
-        abort("couldn't find docker volume")
-
-    registry_certs_volume = json.loads(output)[0]['Mountpoint']
-    secrets = os.path.join(os.environ['HOME'], '.flowercluster', 'secrets')
-
-    certs = [
-        os.path.join(secrets, 'registry-certs', 'domain.crt'),
-        os.path.join(secrets, 'registry-certs', 'domain.key'),
+    args = [
+        'gcloud compute instances create flowercluster',
+        '--metadata-from-file user-data=config/ignition.json',
+        '--tags flowercluster',
+        "--disk name={0},device-name={0}".format(config['disk']),
+        "--machine-type {}".format(config['machine-type']),
+        "--network {}".format(config['network']),
+        "--image {}".format(config['image']),
     ]
 
-    with cd(registry_certs_volume):
-        for cert in certs:
-            put(cert, 'domain.crt', use_sudo=True)
+    local(string.join(args))
+
+
+@task
+def delete_instance():
+
+    """ Delete flowercluster instance. """
+
+    return local('gcloud compute instances delete flowercluster')
+
+
+@task
+def recreate_instance():
+
+    """ Delete and recreate flowercluster instance. """
+
+    if delete_instance().returncode == '0':
+        launch_instance()
 
 
 @task

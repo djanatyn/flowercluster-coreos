@@ -83,23 +83,8 @@ systemd:
             After=var-lib-docker.mount
             Requires=var-lib-docker.mount
             Requires=clone-flowercluster.service
-            Wants=registry.service
             Wants=gogs.service
             Wants=development.service
-    - name: registry.service
-      enable: True
-      contents: |
-        [Unit]
-        Description=Registry
-        After=vault.service
-
-        [Service]
-        RestartSec=10s
-        Restart=on-failure
-        ExecStartPre=-/usr/bin/docker kill registry1
-        ExecStartPre=-/usr/bin/docker rm registry1
-        ExecStart=/usr/bin/docker run -p 5000:5000 -v registry-data:/var/lib/registry -v registry-certs:/certs -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key --name registry1 registry:2
-        ExecStop=/usr/bin/docker stop -t 2 registry1
     - name: gogs.service
       enable: True
       contents: |
