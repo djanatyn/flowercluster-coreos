@@ -1,10 +1,9 @@
 #!/bin/bash
 
-gcloud compute instances delete stable
-gcloud compute instances create stable \
+gcloud compute instances create flowercluster \
   --machine-type n1-standard-1 \
   --metadata-from-file user-data=ignition.json \
-  --disk name=stable-docker,device-name=stable-docker \
+  --disk name=flowercluster-docker,device-name=flowercluster-docker \
   --network default \
-  --tag stable \
+  --tag flowercluster \
   --image https://www.googleapis.com/compute/v1/projects/coreos-cloud/global/images/coreos-alpha-1185-0-0-v20160928
