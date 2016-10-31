@@ -2,6 +2,7 @@
 
 import json
 import yaml
+import os
 from functools import wraps
 
 from config import load_config
@@ -51,10 +52,17 @@ def registry_certs():
     if output.failed:
         abort("couldn't find docker volume")
 
-    path = json.loads(output)[0]['Mountpoint']
-    with cd(path):
-        put('secrets/registry-domain.crt', 'domain.crt', use_sudo=True)
-        put('secrets/registry-domain.key', 'domain.key', use_sudo=True)
+    registry_certs_volume = json.loads(output)[0]['Mountpoint']
+    secrets = os.path.join(os.environ['HOME'], '.flowercluster', 'secrets')
+
+    certs = [
+        os.path.join(secrets, 'registry-certs', 'domain.crt'),
+        os.path.join(secrets, 'registry-certs', 'domain.key'),
+    ]
+
+    with cd(registry_certs_volume):
+        for cert in certs:
+            put(cert, 'domain.crt', use_sudo=True)
 
 
 @task
