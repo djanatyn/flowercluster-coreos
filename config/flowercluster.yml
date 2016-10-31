@@ -128,32 +128,6 @@ systemd:
         ExecStop=/usr/bin/docker stop haproxy1
 storage:
   files:
-    - path: /etc/docker/certs.d/flowercluster:5000/domain.crt
-      filesystem: root
-      mode: 0644
-      user:
-        id: 0
-      contents:
-        inline: |
-          -----BEGIN CERTIFICATE-----
-          MIIDAzCCAeugAwIBAgIJALW8aEgy1RciMA0GCSqGSIb3DQEBCwUAMBgxFjAUBgNV
-          BAMMDWZsb3dlcmNsdXN0ZXIwHhcNMTYxMDMxMTYyMjQ4WhcNMTcxMDMxMTYyMjQ4
-          WjAYMRYwFAYDVQQDDA1mbG93ZXJjbHVzdGVyMIIBIjANBgkqhkiG9w0BAQEFAAOC
-          AQ8AMIIBCgKCAQEAnxS0E95pnzmSOoKxdDqZ5FVniFmuKVy7Oaz2Ecl3FLcvbfx7
-          mqoI9F0lsuaSdIaDT87tcDgXDA91blyiSSbe+RPG/Hmlb7lQvXRIh5SwtwLoDcLP
-          o9UFCNzO/SjoNLnntqt3bGpT6qRzMYKu3tkzByyQXPbUQ4dO9D2q+b3SYDpPRY0u
-          Srme7HQA798LkSLHO0ENHXwW9BG1dL4SZOKnEwCk+j4egVRQLfLRIezRqcSzdCLL
-          bLSs7L0ApDjwZLk8JtpH5NLSyy+wPm+55990/9vkNhCUIcdXOtl5OFlOh3XZKM3r
-          9IlpTwM7qFFz7SgM9BcxI2HvSsMGLdwg0WLPjwIDAQABo1AwTjAdBgNVHQ4EFgQU
-          vFN43MvmkOT6zINC/csATv9KLaMwHwYDVR0jBBgwFoAUvFN43MvmkOT6zINC/csA
-          Tv9KLaMwDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEAKWAl0bd0+crl
-          AidD8VSg+hxJcEZT3IKJ8PxlureUzPGxm+tk3k++g2To/skrW4KHcJ3HAgK6Bll7
-          uPCbUphJfJKVUe37zJSKIbGrDUboSkTbab7p3fIpehq0NkfHKjkmOX35rtvaNOl9
-          RupX9EsSwNUqReVMDC6cwQEIfFX+vStfN4TgAacM4OkSZ7iZxaRbHUYxSFtkyPJw
-          U0yoCSwFJdBqa6OFJ2ZCdUvhSEO1ug8ERgd2cLx1GeIdIBKX4mZGW+pyRhI6qM5k
-          6/WxI6TLp5gixicV8q+K6D642ioKXzbxMQWSLq9KmDIocjsnMybP1/7hwKUZxiEZ
-          Q70T7pP0zQ==
-          -----END CERTIFICATE-----
     - path: /opt/bin/habitus
       filesystem: root
       mode: 0755
