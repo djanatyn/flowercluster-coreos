@@ -69,7 +69,7 @@ systemd:
         After=docker.service
 
         [Service]
-        WorkingDirectory=/opt/flowercluster/docker-compose/vault
+        WorkingDirectory=/opt/flowercluster/docker/vault
         Type=oneshot
         RemainAfterExit=yes
         ExecStop=/opt/bin/docker-compose stop
