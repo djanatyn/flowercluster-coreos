@@ -2,10 +2,9 @@ version: '2'
 
 services:
   vault:
-    image: vault:latest
+    build: .
     container_name: vault1
     volumes:
-      - ./vault.hcl:/vault/config/vault.hcl
       - vault-backend:/vault/file
     ports:
       - 8200:8200
