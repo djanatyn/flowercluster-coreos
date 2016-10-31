@@ -72,7 +72,7 @@ def recreate_instance():
 
     """ Delete and recreate flowercluster instance. """
 
-    if delete_instance().returncode == '0':
+    if delete_instance().succeeded:
         launch_instance()
 
 
