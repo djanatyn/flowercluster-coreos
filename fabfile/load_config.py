@@ -22,3 +22,5 @@ def load_config():
         config.update(yaml.load(open(path)))
 
     return config
+
+config = load_config()
