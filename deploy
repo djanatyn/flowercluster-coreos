@@ -2,8 +2,6 @@
 
 instance_commands=( delete_instance recreate_instance launch_instance )
 
-echo $1
-
 if [[ $# -eq 0 ]]; then
   fab -R flowercluster -l
 elif [[ ${instance_commands[@]} =~ $1 ]]; then
