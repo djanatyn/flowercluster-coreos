@@ -25,7 +25,6 @@ def launch_instance():
 
 @task
 def delete_instance():
-
     """ Delete flowercluster instance. """
 
     return local('gcloud compute instances delete flowercluster')
@@ -33,7 +32,6 @@ def delete_instance():
 
 @task
 def recreate_instance():
-
     """ Delete and recreate flowercluster instance. """
 
     if delete_instance().succeeded:
