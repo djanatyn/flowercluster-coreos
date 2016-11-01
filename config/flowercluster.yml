@@ -54,6 +54,7 @@ systemd:
       contents: |
         [Unit]
         Description=Fetches flowercluster repository
+        ConditionFirstBoot=yes
         Wants=vault.service
 
         [Service]
