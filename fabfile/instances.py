@@ -36,3 +36,15 @@ def recreate_instance():
 
     if delete_instance().succeeded:
         launch_instance()
+
+
+@task
+def update_metadata():
+    """ Update the metadata with the configuration JSON. """
+
+    args = [
+        'gcloud compute instances add-metadata flowercluster',
+        '--metadata-from-file user-data=config/ignition.json',
+    ]
+
+    return local(string.join(args))
