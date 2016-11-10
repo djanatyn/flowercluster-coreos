@@ -4,7 +4,7 @@ import yaml
 from functools import wraps
 
 from load_config import config
-from fabric.api import task, prefix, hide, run
+from fabric.api import task, prefix, hide, run, roles
 
 
 def vault_task(f):
@@ -20,6 +20,7 @@ def vault_task(f):
     return task(wrapper)
 
 
+@roles('flowercluster')
 @vault_task
 def unseal_vault():
     """ Unseal the vault using keys specified by the user at deploy time. """
@@ -29,6 +30,7 @@ def unseal_vault():
             run('vault unseal ' + key)
 
 
+@roles('flowercluster')
 @vault_task
 def auth_vault():
     """ Authorize with vault API client. """
@@ -37,6 +39,7 @@ def auth_vault():
         run('vault auth ' + config['token'])
 
 
+@roles('flowercluster')
 @task
 def vault_policies():
     """ Update vault policies. """
