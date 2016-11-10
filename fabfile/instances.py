@@ -7,6 +7,18 @@ from fabric.api import task, local
 
 
 @task
+def create_disks():
+    """ Create disks for flowercluster instance. """
+
+    args = [
+        "gcloud compute disks create {}".format(config['disk']),
+        "--size={}".format(config['disk-size']),
+    ]
+
+    local(string.join(args))
+
+
+@task
 def launch_instance():
     """ Launch flowercluster instance. """
 

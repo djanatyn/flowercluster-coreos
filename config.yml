@@ -2,5 +2,6 @@
 VAULT_ADDR: 'http://localhost:8200/'
 machine-type: 'n1-standard-1'
 disk: 'flowercluster-docker'
+disk-size: '250GB'
 network: 'default'
 image: 'https://www.googleapis.com/compute/v1/projects/coreos-cloud/global/images/coreos-alpha-1185-0-0-v20160928'
