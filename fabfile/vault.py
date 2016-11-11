@@ -14,7 +14,7 @@ def auth_vault():
     """ Authorize with vault API client. """
 
     with hide('running', 'stdout', 'stderr'):
-        run('vault auth ' + config['token'])
+        run('vault auth ' + configuration['token'])
 
 
 def vault_task(f):
@@ -35,7 +35,7 @@ def vault_task(f):
 def unseal_vault():
     """ Unseal the vault using keys specified by the user at deploy time. """
 
-    for key in config['unseal_keys']:
+    for key in configuration['unseal_keys']:
         with hide('running', 'stdout', 'stderr'):
             run('vault unseal ' + key)
 
