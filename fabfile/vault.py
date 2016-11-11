@@ -7,7 +7,7 @@ from load_config import configuration
 from fabric.api import task, prefix, hide, run, roles
 
 
-config = configuration['vault']
+vault_config = configuration['vault']
 
 
 def auth_vault():
@@ -22,7 +22,7 @@ def vault_task(f):
 
     @wraps(f)
     def wrapper(*args, **kwargs):
-        addr_prefix = prefix('export VAULT_ADDR=' + config['VAULT_ADDR'])
+        addr_prefix = prefix('export VAULT_ADDR=' + vault_config['VAULT_ADDR'])
 
         with addr_prefix:
             return f(*args, **kwargs)

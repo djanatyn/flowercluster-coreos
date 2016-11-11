@@ -5,7 +5,7 @@ import string
 from load_config import configuration
 from fabric.api import task, local
 
-config = configuration['flowercluster-instance']
+instance_config = configuration['flowercluster-instance']
 
 
 @task
@@ -13,8 +13,8 @@ def create_disks():
     """ Create disks for flowercluster instance. """
 
     args = [
-        "gcloud compute disks create {}".format(config['disk']),
-        "--size={}".format(config['disk-size']),
+        "gcloud compute disks create {}".format(instance_config['disk']),
+        "--size={}".format(instance_config['disk-size']),
     ]
 
     local(string.join(args))
@@ -28,10 +28,10 @@ def launch_instance():
         'gcloud compute instances create flowercluster',
         '--metadata-from-file user-data=config/ignition.json',
         '--tags flowercluster',
-        "--disk name={0},device-name={0}".format(config['disk']),
-        "--machine-type {}".format(config['machine-type']),
-        "--network {}".format(config['network']),
-        "--image {}".format(config['image']),
+        "--disk name={0},device-name={0}".format(instance_config['disk']),
+        "--machine-type {}".format(instance_config['machine-type']),
+        "--network {}".format(instance_config['network']),
+        "--image {}".format(instance_config['image']),
     ]
 
     local(string.join(args))
