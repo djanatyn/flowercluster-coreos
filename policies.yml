@@ -1,0 +1,2 @@
+---
+ansible: '/opt/flowercluster/policies/ansible.hcl'

@@ -10,6 +10,13 @@ from fabric.api import task, prefix, hide, run, roles
 config = configuration['vault']
 
 
+def auth_vault():
+    """ Authorize with vault API client. """
+
+    with hide('running', 'stdout', 'stderr'):
+        run('vault auth ' + config['token'])
+
+
 def vault_task(f):
     """ Decorator for exporting VAULT environmental variables. """
 
@@ -35,19 +42,11 @@ def unseal_vault():
 
 @roles('flowercluster')
 @vault_task
-def auth_vault():
-    """ Authorize with vault API client. """
-
-    with hide('running', 'stdout', 'stderr'):
-        run('vault auth ' + config['token'])
-
-
-@roles('flowercluster')
-@task
-def vault_policies():
+def init_policies():
     """ Update vault policies. """
 
-    policies = yaml.load(open('policy.yml'))
+    policies = yaml.load(open('policies.yml'))
 
-    for name, policy in policies.iteritems():
-        pass
+    auth_vault()
+    for policy, path in policies.iteritems():
+        run("vault policy-write {0} {1}".format(policy, path))
