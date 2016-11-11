@@ -1,0 +1,6 @@
+build:
+  version: 2016-03-14 # version of the build schema.
+  steps:
+    fedora-ansible:
+      name: flowercluster/fedora-ansible
+      dockerfile: Dockerfile.fedora-ansible
