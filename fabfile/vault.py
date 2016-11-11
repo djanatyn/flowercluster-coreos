@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import yaml
 from functools import wraps
 
 from load_config import configuration
@@ -42,11 +41,9 @@ def unseal_vault():
 
 @roles('flowercluster')
 @vault_task
-def init_policies():
-    """ Update vault policies. """
-
-    policies = yaml.load(open('policies.yml'))
+def init_approles():
+    """ Update vault AppRoles and associated policies. """
 
     auth_vault()
-    for policy, path in policies.iteritems():
-        run("vault policy-write {0} {1}".format(policy, path))
+    for role, role_config in vault_config['approles'].iteritems():
+        run("vault policy-write {0} {1}".format(role, role_config['path']))

@@ -1,6 +1,9 @@
 ---
 vault:
   VAULT_ADDR: 'http://localhost:8200/'
+  approles:
+    ansible:
+      path: '/opt/flowercluster/policies/ansible.hcl'
 flowercluster-instance:
   machine-type: 'n1-standard-1'
   disk: 'flowercluster-docker'
