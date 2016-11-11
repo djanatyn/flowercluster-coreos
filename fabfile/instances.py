@@ -2,8 +2,10 @@
 
 import string
 
-from load_config import config
+from load_config import configuration
 from fabric.api import task, local
+
+config = configuration['flowercluster-instance']
 
 
 @task

@@ -23,4 +23,4 @@ def load_config():
 
     return config
 
-config = load_config()
+configuration = load_config()

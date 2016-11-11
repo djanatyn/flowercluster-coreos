@@ -3,8 +3,11 @@
 import yaml
 from functools import wraps
 
-from load_config import config
+from load_config import configuration
 from fabric.api import task, prefix, hide, run, roles
+
+
+config = configuration['vault']
 
 
 def vault_task(f):
