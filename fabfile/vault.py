@@ -43,10 +43,15 @@ def unseal():
 @roles('flowercluster')
 @vault_task
 def init_roles():
-    """ Update vault AppRoles and associated policies. """
+    """ Update vault AppRoles and policies. """
 
     auth_vault()
 
+    # update policies
+    for policy, path in vault_config['policies'].iteritems():
+        run("vault policy-write {0} {1}".format(policy, path))
+
+    # update roles and their policies
     defaults = vault_config['approles']['defaults']
     for role, role_config in vault_config['approles'].iteritems():
         # skip default role

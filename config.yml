@@ -1,6 +1,8 @@
 ---
 vault:
   VAULT_ADDR: 'http://localhost:8200/'
+  policies:
+    build-token: '/opt/flowercluster/policies/build-token.hcl'
   approles:
     defaults:
       secret_id_ttl: '10m'
