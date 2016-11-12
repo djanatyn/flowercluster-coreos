@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import string
 from functools import wraps
 
 from load_config import configuration
@@ -45,5 +46,26 @@ def init_approles():
     """ Update vault AppRoles and associated policies. """
 
     auth_vault()
+
+    defaults = vault_config['approles']['defaults']
     for role, role_config in vault_config['approles'].iteritems():
+        # skip default role
+        if role == 'defaults':
+            continue
+
+        # update policy
         run("vault policy-write {0} {1}".format(role, role_config['path']))
+
+        # update AppRole
+        approle_args = ["vault write auth/approle/role/{}".format(role)]
+
+        # append keys and values for each AppRole init argument
+        for arg in defaults.keys():
+            if arg in role_config:
+                value = role_config[arg]
+            else:
+                value = defaults[arg]
+
+            approle_args.append("{0}={1}".format(arg, value))
+
+        run(string.join(approle_args))

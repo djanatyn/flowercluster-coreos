@@ -2,6 +2,11 @@
 vault:
   VAULT_ADDR: 'http://localhost:8200/'
   approles:
+    defaults:
+      secret_id_ttl: '10m'
+      token_ttl: '10m'
+      token_max_ttl: '10m'
+      secret_id_num_uses: '1'
     ansible:
       path: '/opt/flowercluster/policies/ansible.hcl'
 flowercluster-instance:
