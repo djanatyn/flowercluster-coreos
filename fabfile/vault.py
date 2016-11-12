@@ -6,7 +6,6 @@ from functools import wraps
 from load_config import configuration
 from fabric.api import task, prefix, hide, run, roles
 
-
 vault_config = configuration['vault']
 
 
