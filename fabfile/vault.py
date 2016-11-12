@@ -32,7 +32,7 @@ def vault_task(f):
 
 @roles('flowercluster')
 @vault_task
-def unseal_vault():
+def unseal():
     """ Unseal the vault using keys specified by the user at deploy time. """
 
     for key in configuration['unseal_keys']:
@@ -42,7 +42,7 @@ def unseal_vault():
 
 @roles('flowercluster')
 @vault_task
-def init_approles():
+def init_roles():
     """ Update vault AppRoles and associated policies. """
 
     auth_vault()
