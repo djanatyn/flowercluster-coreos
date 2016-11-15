@@ -89,5 +89,4 @@ def build_token():
         token_args.append("-{0}={1}".format(arg, value))
 
     token = yaml.load(run(string.join(token_args)))
-
     return token
