@@ -11,6 +11,9 @@ vault:
       secret_id_num_uses: '1'
     ansible:
       path: '/opt/flowercluster/policies/ansible.hcl'
+  build-token:
+    ttl: '10m'
+    renewable: 'false'
 flowercluster-instance:
   machine-type: 'n1-standard-1'
   disk: 'flowercluster-docker'

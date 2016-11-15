@@ -3,6 +3,7 @@
 import string
 from functools import wraps
 
+import yaml
 from load_config import configuration
 from fabric.api import task, prefix, hide, run, roles
 
@@ -73,3 +74,20 @@ def init_roles():
             approle_args.append("{0}={1}".format(arg, value))
 
         run(string.join(approle_args))
+
+
+@roles('flowercluster')
+@vault_task
+def build_token():
+    """ Generate and return a build token. """
+
+    auth_vault()
+
+    token_args = ['vault token-create -format=yaml -policy=build-token']
+
+    for arg, value in vault_config['build-token'].iteritems():
+        token_args.append("-{0}={1}".format(arg, value))
+
+    token = yaml.load(run(string.join(token_args)))
+
+    return token
