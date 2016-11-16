@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import string
+import os
 from functools import wraps
 
 import yaml
@@ -88,5 +89,16 @@ def build_token():
     for arg, value in vault_config['build-token'].iteritems():
         token_args.append("-{0}={1}".format(arg, value))
 
-    token = yaml.load(run(string.join(token_args)))
+    token = yaml.load(run(string.join(token_args)))['auth']['client_token']
+
+    # save token to file
+    if not os.path.isdir('out'):
+        print("Creating ./out/ directory.")
+        os.mkdir('out')
+
+    with open(os.path.join('out', 'build-tokens'), 'a') as f:
+        f.write(token + "\n")
+
+    print('Token written to ./out/build-tokens.')
+
     return token
