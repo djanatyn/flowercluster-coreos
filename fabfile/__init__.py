@@ -5,9 +5,10 @@ from fabric.api import env
 
 import vault
 import instances
+import build
 
 env.port = '2222'
 
 update_roles_gce(use_cache=False)
 
-__all__ = ['instances', 'vault']
+__all__ = ['instances', 'vault', 'build']
