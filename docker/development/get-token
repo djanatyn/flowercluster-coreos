@@ -1,5 +1,8 @@
 #!/bin/bash
 
-UNWRAP_URL="http://flowercluster:8200/v1/sys/wrapping/unwrap"
+AUTH_URL="http://flowercluster:8200/v1/auth/approle/login"
 
-curl -X POST -H "X-Vault-Token: ${SECRET_TOKEN}" $UNWRAP_URL
+ROLE_ID=156ce5e6-9c7c-bbda-960c-25ca4ccd3f95
+SECRET_ID=$1
+
+printf '{"role_id":"%s","secret_id":"%s"}' $ROLE_ID $SECRET_ID | curl -v -X POST -d @- $AUTH_URL
