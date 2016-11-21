@@ -7,17 +7,13 @@ from functools import wraps
 import yaml
 from load_config import configuration
 from fabric.api import task, prefix, hide, run, roles
+from fabric.colors import green
 
 vault_config = configuration['vault']
+token_file = os.path.join('out', 'build-token')
 
 
-def auth_vault():
-    """ Authorize with vault API client. """
-
-    with hide('running', 'stdout', 'stderr'):
-        run('vault auth ' + configuration['token'])
-
-
+@roles('flowercluster')
 def vault_task(f):
     """ Decorator for exporting VAULT environmental variables. """
 
@@ -29,6 +25,14 @@ def vault_task(f):
             return f(*args, **kwargs)
 
     return task(wrapper)
+
+
+@vault_task
+def auth_vault():
+    """ Authorize with vault API client. """
+
+    with hide('running', 'stdout', 'stderr'):
+        run('vault auth ' + configuration['token'])
 
 
 @roles('flowercluster')
@@ -77,11 +81,29 @@ def init_roles():
         run(string.join(approle_args))
 
 
+@task
+def save_token(token):
+    """ Write the build token to disk. """
+
+    if not os.path.isdir('out'):
+        print("Creating ./out/ directory.")
+        os.mkdir('out')
+
+    with open(os.path.join('out', 'build-token'), 'w') as f:
+        f.write(token)
+
+
 @roles('flowercluster')
 @vault_task
 def build_token():
     """ Generate and return a build token. """
 
+    # check for saved token file at first
+    if os.path.exists(token_file):
+        print(green('found saved build token!'))
+        return open(token_file).read()
+
+    # otherwise, generate a new token
     auth_vault()
 
     token_args = ['vault token-create -format=yaml -policy=build-token']
@@ -89,16 +111,24 @@ def build_token():
     for arg, value in vault_config['build-token'].iteritems():
         token_args.append("-{0}={1}".format(arg, value))
 
-    token = yaml.load(run(string.join(token_args)))['auth']['client_token']
+    with hide('running', 'stdout'):
+        token = yaml.load(run(string.join(token_args)))['auth']['client_token']
 
-    # save token to file
-    if not os.path.isdir('out'):
-        print("Creating ./out/ directory.")
-        os.mkdir('out')
+    print(green('generated token!'))
+    print('saving to ./out/build-token')
 
-    with open(os.path.join('out', 'build-tokens'), 'a') as f:
-        f.write(token + "\n")
-
-    print('Token written to ./out/build-tokens.')
+    save_token(token)
 
     return token
+
+
+@roles('flowercluster')
+@vault_task
+def approle_creds(approle, token=None):
+    """ Return the RoleID and a SecretID for an Approle. """
+
+    if token is None:
+        token = build_token()
+
+    if approle not in vault_config['approles'].keys():
+        raise StandardError("Invalid AppRole!")
