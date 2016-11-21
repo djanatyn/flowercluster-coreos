@@ -27,7 +27,6 @@ def vault_task(f):
     return task(wrapper)
 
 
-@vault_task
 def auth_vault():
     """ Authorize with vault API client. """
 
@@ -81,7 +80,6 @@ def init_roles():
         run(string.join(approle_args))
 
 
-@task
 def save_token(token):
     """ Write the build token to disk. """
 
@@ -127,8 +125,23 @@ def build_token():
 def approle_creds(approle, token=None):
     """ Return the RoleID and a SecretID for an Approle. """
 
+    if approle not in vault_config['approles'].keys():
+        raise StandardError("Invalid AppRole!")
+
     if token is None:
         token = build_token()
 
-    if approle not in vault_config['approles'].keys():
-        raise StandardError("Invalid AppRole!")
+    auth_vault()
+
+    role = "auth/approle/role/{}".format(approle)
+
+    role_cmd = "vault read -format=yaml {}".format(role + '/role-id')
+    secret_cmd = "vault write -format=yaml -f {}".format(role + '/secret-id')
+
+    with hide('stdout'):
+        creds = {
+            'role_id': yaml.load(run(role_cmd))['data']['role_id'],
+            'secret_id': yaml.load(run(secret_cmd))['data']['secret_id'],
+        }
+
+    return creds
