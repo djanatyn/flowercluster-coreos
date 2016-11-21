@@ -165,3 +165,18 @@ storage:
             hash:
               function: 'sha512'
               sum: '5a37ad553d38849a5a91568ce03d23abf668850049b3d550a5309a1acc391347156d09e08c8115599654c19a7c67856aa6776ac939a34440a095eb35cc47de37'
+    - path: /etc/ssh/sshd_config
+      filesystem: root
+      mode: 0777
+      user:
+        id: 0
+      contents:
+        inline: |
+          # Use most defaults for sshd configuration.
+          UsePrivilegeSeparation sandbox
+          Subsystem sftp internal-sftp
+          ClientAliveInterval 180
+          UseDNS no
+          UsePAM yes
+          PrintLastLog no # handled by PAM
+          PrintMotd no # handled by PAM
