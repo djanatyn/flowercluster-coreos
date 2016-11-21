@@ -1,6 +1,6 @@
 ---
 vault:
-  VAULT_ADDR: 'http://localhost:8200/'
+  VAULT_ADDR: 'http://flowercluster:8200/'
   policies:
     build-token: '/opt/flowercluster/policies/build-token.hcl'
   approles:

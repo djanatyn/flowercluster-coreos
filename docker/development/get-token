@@ -1,5 +1,5 @@
 #!/bin/bash
 
-UNWRAP_URL="http://localhost:8200/v1/sys/wrapping/unwrap"
+UNWRAP_URL="http://flowercluster:8200/v1/sys/wrapping/unwrap"
 
 curl -X POST -H "X-Vault-Token: ${SECRET_TOKEN}" $UNWRAP_URL
