@@ -1,0 +1,5 @@
+#!/bin/bash
+
+UNWRAP_URL="${VAULT_ADDR}/v1/sys/wrapping/unwrap"
+
+curl -X POST -H "X-Vault-Token: ${SECRET_TOKEN}" $UNWRAP_URL

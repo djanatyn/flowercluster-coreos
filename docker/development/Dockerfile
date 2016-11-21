@@ -1,4 +1,11 @@
-FROM stable:5000/fedora-ansible:latest
+FROM flowercluster/fedora-ansible:latest
+
+ARG SECRET_TOKEN
+ARG ROLE_ID
+
+# fetch recyclable token
+ADD ./get-token /usr/bin/get-token
+RUN SECRET_TOKEN=${SECRET_TOKEN} ROLE_ID=${ROLE_ID} /usr/bin/get-token
 
 ADD ./vault_pass /root/vault_pass
 
