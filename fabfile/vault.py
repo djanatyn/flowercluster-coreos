@@ -27,11 +27,14 @@ def vault_task(f):
     return task(wrapper)
 
 
-def auth_vault():
+def auth_vault(token=None):
     """ Authorize with vault API client. """
 
+    if token is None:
+        token = configuration['token']
+
     with hide('running', 'stdout', 'stderr'):
-        run('vault auth ' + configuration['token'])
+        run('vault auth ' + token)
 
 
 @roles('flowercluster')
@@ -120,10 +123,9 @@ def build_token():
     return token
 
 
-@roles('flowercluster')
 @vault_task
 def approle_creds(approle, token=None):
-    """ Return the RoleID and a SecretID for an Approle. """
+    """ Return the RoleID and a SecretID for an AppRole. """
 
     if approle not in vault_config['approles'].keys():
         raise StandardError("Invalid AppRole!")
@@ -131,17 +133,28 @@ def approle_creds(approle, token=None):
     if token is None:
         token = build_token()
 
-    auth_vault()
+    auth_vault(token)
 
     role = "auth/approle/role/{}".format(approle)
 
-    role_cmd = "vault read -format=yaml {}".format(role + '/role-id')
-    secret_cmd = "vault write -format=yaml -f {}".format(role + '/secret-id')
+    role_cmd = [
+        'vault read',
+        '-format=yaml',
+        role + '/role-id'
+    ]
+
+    secret_cmd = [
+        'vault write',
+        '-wrap-ttl=5m',
+        '-format=yaml',
+        '-f',
+        role + '/secret-id',
+    ]
 
     with hide('stdout'):
         creds = {
-            'role_id': yaml.load(run(role_cmd))['data']['role_id'],
-            'secret_id': yaml.load(run(secret_cmd))['data']['secret_id'],
+            'ROLE_ID': yaml.load(run(string.join(role_cmd)))['data']['role_id'],
+            'SECRET_TOKEN': yaml.load(run(string.join(secret_cmd)))['wrap_info']['token'],
         }
 
     return creds

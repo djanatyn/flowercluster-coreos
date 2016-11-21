@@ -23,3 +23,6 @@ flowercluster-instance:
 build:
 - path: '/opt/flowercluster/docker/fedora-ansible'
   name: 'flowercluster/fedora-ansible'
+- path: '/opt/flowercluster/docker/development'
+  name: 'flowercluster/development'
+  approle: 'ansible'
