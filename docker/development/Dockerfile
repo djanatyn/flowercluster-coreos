@@ -7,7 +7,7 @@ ADD ./get-secret-id /usr/bin/get-secret-id
 ADD ./get-token /usr/bin/get-token
 
 RUN echo ${SECRET_TOKEN} > /var/local/SECRET_TOKEN 
-RUN echo ${ROLE_ID} > /var/locala/ROLE_ID
+RUN echo ${ROLE_ID} > /var/local/ROLE_ID
 
 RUN git clone http://git.flowercluster.io/flowercluster/flowercluster-development.git /var/local/ansible
 RUN ansible-galaxy install -r /var/local/ansible/requirements.yml
