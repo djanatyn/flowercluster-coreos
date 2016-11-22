@@ -5,7 +5,7 @@ import string
 from load_config import configuration
 from fabric.api import task, run, cd, roles
 
-from vault import approle_creds
+import vault
 
 build_config = configuration['build']
 
@@ -22,10 +22,12 @@ def containers():
 
         if 'approle' in container:
             # append vault credentials
-            creds = approle_creds(container['approle'])
+            creds = vault.approle_creds(container['approle'])
 
             for key, value in creds.iteritems():
                 args.append("--build-arg {0}={1}".format(key, value))
 
         with cd(container['path']):
             run(string.join(args))
+
+__all__ = ['containers']
