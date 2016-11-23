@@ -5,6 +5,6 @@ AUTH_URL="http://flowercluster:8200/v1/auth/approle/login"
 ROLE_ID=$(cat /root/role-id)
 SECRET_ID=$(cat /root/secret-id)
 
-printf '{"role_id":"%s","secret_id":"%s"}' $ROLE_ID $SECRET_ID | curl -X POST -d @- $AUTH_URL | jq '.data.client_token' > /root/vault_token
+printf '{"role_id":"%s","secret_id":"%s"}' $ROLE_ID $SECRET_ID | curl -X POST -d @- $AUTH_URL | jq -r '.auth.client_token' > /root/vault_token
 
 chmod 600 /root/vault_token
