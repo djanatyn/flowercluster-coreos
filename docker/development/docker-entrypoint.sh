@@ -8,4 +8,4 @@ cd /var/local/ansible
 ansible-playbook --vault-password-file=/usr/sbin/vault_pass setup.yml
 
 # supervisord
-/usr/bin/supervisord
+exec /usr/bin/supervisord
