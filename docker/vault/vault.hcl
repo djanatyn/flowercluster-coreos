@@ -3,7 +3,6 @@ backend "file" {
 }
 
 default_lease_ttl = "168h"
-max_lease_ttl = "720h"
 
 listener "tcp" {
   address = "0.0.0.0:8200"
