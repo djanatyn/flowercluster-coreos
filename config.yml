@@ -11,7 +11,7 @@ vault:
     ansible:
       path: '/opt/flowercluster/policies/ansible.hcl'
       token_ttl: '24h'
-      token_max_ttl: '8760h'
+      token_max_ttl: '168h'
       renewable: 'true'
   build-token:
     ttl: '10m'
