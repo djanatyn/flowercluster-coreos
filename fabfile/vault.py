@@ -72,6 +72,9 @@ def init_roles():
         approle_args = ["vault write auth/approle/role/{}".format(role)]
 
         for arg, value in role_config.iteritems():
+            if arg == 'path':
+                continue
+
             approle_args.append("{0}={1}".format(arg, value))
 
         # append keys and values for each AppRole init argument
