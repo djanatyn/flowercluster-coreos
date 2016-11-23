@@ -71,14 +71,13 @@ def init_roles():
         # update AppRole
         approle_args = ["vault write auth/approle/role/{}".format(role)]
 
+        for arg, value in role_config.iteritems():
+            approle_args.append("{0}={1}".format(arg, value))
+
         # append keys and values for each AppRole init argument
         for arg in defaults.keys():
-            if arg in role_config:
-                value = role_config[arg]
-            else:
-                value = defaults[arg]
-
-            approle_args.append("{0}={1}".format(arg, value))
+            if arg not in role_config:
+                approle_args.append("{0}={1}".format(arg, defaults[arg]))
 
         run(string.join(approle_args))
 
