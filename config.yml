@@ -10,6 +10,7 @@ vault:
       secret_id_num_uses: '1'
     ansible:
       path: '/opt/flowercluster/policies/ansible.hcl'
+      policy: 'ansible'
       token_ttl: '24h'
       token_max_ttl: '168h'
       renewable: 'true'
