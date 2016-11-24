@@ -3,7 +3,7 @@
 AUTH_URL="http://flowercluster:8200/v1/auth/approle/login"
 
 ROLE_ID=$(cat /root/role-id)
-SECRET_ID=$(cat /root/secret-id)
+SECRET_ID=$1
 
 DATA=$(printf '{"role_id":"%s","secret_id":"%s"}' $ROLE_ID $SECRET_ID)
 
