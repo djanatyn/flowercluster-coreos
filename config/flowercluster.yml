@@ -109,10 +109,10 @@ systemd:
         [Service]
         RestartSec=10s
         Restart=on-failure
-        ExecStartPre=-/usr/bin/docker kill development1
-        ExecStartPre=-/usr/bin/docker rm development1
-        ExecStart=/usr/bin/docker run --name development1 -v home-data:/home -p 2222:22 flowercluster:5000/development
-        ExecStop=/usr/bin/docker stop -t 2 development1
+        ExecStartPre=-/usr/bin/docker kill dev1
+        ExecStartPre=-/usr/bin/docker rm dev1
+        ExecStart=/usr/bin/docker run --name dev1 -v home-data:/home -p 22:22 flowercluster/development
+        ExecStop=/usr/bin/docker stop -t 2 dev1
     - name: haproxy.service
       enable: True
       contents: |
