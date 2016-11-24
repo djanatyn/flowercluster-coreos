@@ -9,7 +9,7 @@ ADD ./get-token /usr/bin/get-token
 ADD ./vault_pass /usr/sbin/vault_pass
 
 RUN echo ${ROLE_ID} > /root/role-id
-RUN /usr/bin/get-secret-id ${SECRET_TOKEN} > /root/secret-id
+RUN echo ${SECRET_TOKEN} > /root/secret-token
 
 # add flowercluster repository
 RUN git clone http://github.com/djanatyn/flowercluster-development /var/local/ansible

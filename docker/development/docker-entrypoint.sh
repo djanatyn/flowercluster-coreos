@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # fetch token
-/usr/bin/get-token
+SECRET_TOKEN=$(cat /root/secret-token)
+/usr/bin/get-token $(/usr/bin/get-secret-id ${SECRET_TOKEN})
 
 # run ansible
 cd /var/local/ansible
