@@ -117,17 +117,15 @@ def build_token():
     with hide('running', 'stdout'):
         token = yaml.load(run(string.join(token_args)))['auth']['client_token']
 
-    print(green('generated token!'))
-    print('saving to ./out/build-token')
-
     save_token(token)
 
     return token
 
 
+@roles('flowercluster')
 @vault_task
-def approle_creds(approle, token=None):
-    """ Return the RoleID and a SecretID for an AppRole. """
+def role_id(approle, token=None):
+    """ Get the RoleID for a given AppRole. """
 
     if approle not in vault_config['approles'].keys():
         raise StandardError("Invalid AppRole!")
@@ -138,13 +136,29 @@ def approle_creds(approle, token=None):
     auth_vault(token)
 
     role = "auth/approle/role/{}".format(approle)
+    role_cmd = "vault read -format=yaml {0}".format(role + '/role-id')
 
-    role_cmd = [
-        'vault read',
-        '-format=yaml',
-        role + '/role-id'
-    ]
+    with hide('stdout'):
+        role_id = yaml.load(run(role_cmd))['data']['role_id']
 
+    print(green('RoleID: ' + role_id))
+    return role_id
+
+
+@roles('flowercluster')
+@vault_task
+def secret_id(approle, token=None):
+    """ Return a SecretID wrapped-token. """
+
+    if approle not in vault_config['approles'].keys():
+        raise StandardError("Invalid AppRole!")
+
+    if token is None:
+        token = build_token()
+
+    auth_vault(token)
+
+    role = "auth/approle/role/{}".format(approle)
     secret_cmd = [
         'vault write',
         '-wrap-ttl=5m',
@@ -154,9 +168,7 @@ def approle_creds(approle, token=None):
     ]
 
     with hide('stdout'):
-        creds = {
-            'ROLE_ID': yaml.load(run(string.join(role_cmd)))['data']['role_id'],
-            'SECRET_TOKEN': yaml.load(run(string.join(secret_cmd)))['wrap_info']['token'],
-        }
+        token = yaml.load(run(string.join(secret_cmd)))['wrap_info']['token']
 
-    return creds
+    print(green('SecretID Wrap Token: ' + token))
+    return token
