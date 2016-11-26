@@ -1,8 +1,11 @@
 #!/bin/bash
 
-# fetch token
-SECRET_TOKEN=$(cat /root/secret-token)
-/usr/bin/get-token $(/usr/bin/get-secret-id ${SECRET_TOKEN}) >/dev/null
+if [[ ! -f /root/vault_token ]]; then
+  # fetch token
+  SECRET_TOKEN=$1
+
+  /usr/bin/get-token $(/usr/bin/get-secret-id ${SECRET_TOKEN}) >/dev/null
+fi
 
 # run ansible
 cd /var/local/ansible
