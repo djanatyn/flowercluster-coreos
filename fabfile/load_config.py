@@ -17,6 +17,9 @@ def load_config():
     # add user paths
     config_paths += [os.path.join(user_config, path) for path in config_paths]
 
+    if not os.path.isdir(user_config):
+        os.mkdir(user_config)
+
     config = {}
     for path in [path for path in config_paths if os.path.isfile(path)]:
         config.update(yaml.load(open(path)))
