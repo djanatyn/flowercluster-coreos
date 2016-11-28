@@ -6,6 +6,7 @@ ARG ROLE_ID
 ADD ./get-secret-id /usr/bin/get-secret-id
 ADD ./get-token /usr/bin/get-token
 ADD ./vault_pass /usr/sbin/vault_pass
+ADD ./update_development /usr/bin/update_development
 
 RUN echo ${ROLE_ID} > /root/role-id
 
