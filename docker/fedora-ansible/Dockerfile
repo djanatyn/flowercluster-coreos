@@ -1,7 +1,7 @@
 FROM fedora:24
 
 # install basic development packages
-RUN dnf install -y git sudo python-pip clang python-devel redhat-rpm-config openssl-devel libffi-devel python2-cffi python2-dnf openssh-server passwd @development-tools jq
+RUN dnf install -y git sudo python-pip clang python-devel redhat-rpm-config openssl-devel libffi-devel python2-cffi python2-dnf openssh-server passwd @development-tools jq vim
 
 # add ansible user + paths
 RUN useradd -r -M -U ansible
