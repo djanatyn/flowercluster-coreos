@@ -6,9 +6,17 @@ ROLE_ID=$(cat /root/role-id)
 SECRET_ID=$1
 
 DATA=$(printf '{"role_id":"%s","secret_id":"%s"}' $ROLE_ID $SECRET_ID)
+RESPONSE=$(curl -q -X POST -d @- $AUTH_URL 2>/dev/null <<< "$DATA")
 
-RESPONSE=$(echo $DATA | curl -q -X POST -d @- $AUTH_URL 2>/dev/null)
+TOKEN=$(jq -r '.auth.client_token' <<< "$RESPONSE")
 
-echo $RESPONSE | jq -r '.auth.client_token' | tee /root/vault_token
+if [[ $TOKEN == 'null' ]]; then
+  echo "failed to fetch AppRole token:"
+  jq '.' <<< "$RESPONSE"
 
-chmod 600 /root/vault_token
+  exit 1
+else
+  echo "successfully fetched AppRole token!"
+  echo $TOKEN > /root/vault_token && chmod 600 /root/vault_token
+fi
+

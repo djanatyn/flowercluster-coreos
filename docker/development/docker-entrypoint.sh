@@ -1,15 +1,16 @@
 #!/bin/bash
 
+# fetch token inside container it doesn't exist
 if [[ ! -f /root/vault_token ]]; then
-  # fetch token
-  SECRET_TOKEN=$1
+  echo "no token found inside container!"
 
-  /usr/bin/get-token $(/usr/bin/get-secret-id ${SECRET_TOKEN}) >/dev/null
-
-  if [[ $? != 0 ]]; then
-    echo "failed to get AppRole token!"
+  if [[ $# -eq 0 ]]; then
+    echo "please pass a SecretID wrap token as an argument!"
     exit 1
   fi
+
+  SECRET_TOKEN=$1
+  exec /usr/bin/get-token $(/usr/bin/get-secret-id ${SECRET_TOKEN}) >/dev/null
 fi
 
 # run ansible
