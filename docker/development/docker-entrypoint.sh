@@ -14,8 +14,7 @@ if [[ ! -f /root/vault_token ]]; then
 fi
 
 # run ansible
-cd /var/local/ansible
-ansible-playbook --vault-password-file=/usr/sbin/vault_pass setup.yml
+/usr/bin/update_development
 
 # supervisord
 exec /usr/bin/supervisord
