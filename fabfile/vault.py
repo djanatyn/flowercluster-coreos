@@ -156,7 +156,7 @@ def secret_id(approle, token=None):
     secret_cmd = 'vault write -wrap-ttl=5m -format=yaml -f ' + role + '/secret-id'
 
     with hide('stdout'):
-        token = yaml.load(run(string.join(secret_cmd)))['wrap_info']['token']
+        token = yaml.load(run(secret_cmd))['wrap_info']['token']
 
     print(green('SecretID Wrap Token: ' + token))
     return token
