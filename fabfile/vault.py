@@ -1,19 +1,39 @@
 #!/usr/bin/env python
 
 import string
-import os
 from functools import wraps
 
 import yaml
-from load_config import configuration
 from fabric.api import task, prefix, hide, run, roles
 from fabric.colors import green
 
+from load_config import configuration
+from tokens import save_token, load_token
+
 vault_config = configuration['vault']
-token_file = os.path.join('out', 'build-token')
 
 
-@roles('flowercluster')
+def get_build_token():
+    """ Attempt to load a build token. If one can't be found, generate another. """
+
+    token = load_token()
+
+    if token is None:
+        token = build_token()
+
+    return token
+
+
+def auth_vault(token=None):
+    """ Authorize with vault API client. """
+
+    if token is None:
+        token = configuration['token']
+
+    with hide('running', 'stdout', 'stderr'):
+        run('vault auth ' + token)
+
+
 def vault_task(f):
     """ Decorator for exporting VAULT environmental variables. """
 
@@ -25,16 +45,6 @@ def vault_task(f):
             return f(*args, **kwargs)
 
     return task(wrapper)
-
-
-def auth_vault(token=None):
-    """ Authorize with vault API client. """
-
-    if token is None:
-        token = configuration['token']
-
-    with hide('running', 'stdout', 'stderr'):
-        run('vault auth ' + token)
 
 
 @roles('flowercluster')
@@ -85,28 +95,13 @@ def init_roles():
         run(string.join(approle_args))
 
 
-def save_token(token):
-    """ Write the build token to disk. """
-
-    if not os.path.isdir('out'):
-        print("Creating ./out/ directory.")
-        os.mkdir('out')
-
-    with open(os.path.join('out', 'build-token'), 'w') as f:
-        f.write(token)
-
-
 @roles('flowercluster')
 @vault_task
 def build_token():
-    """ Generate and return a build token. """
+    """ Generate and return a build token.
 
-    # check for saved token file at first
-    if os.path.exists(token_file):
-        print(green('found saved build token!'))
-        return open(token_file).read()
-
-    # otherwise, generate a new token
+    Tokens are saved to $HOME/.flowercluster/tokens.yml.
+    """
     auth_vault()
 
     token_args = ['vault token-create -format=yaml -policy=build-token']
@@ -115,11 +110,10 @@ def build_token():
         token_args.append("-{0}={1}".format(arg, value))
 
     with hide('running', 'stdout'):
-        token = yaml.load(run(string.join(token_args)))['auth']['client_token']
+        token = yaml.load(run(string.join(token_args)))
 
     save_token(token)
-
-    return token
+    return token['auth']['client_token']
 
 
 @roles('flowercluster')
@@ -131,12 +125,12 @@ def role_id(approle, token=None):
         raise StandardError("Invalid AppRole!")
 
     if token is None:
-        token = build_token()
+        token = get_build_token()
 
     auth_vault(token)
 
-    role = "auth/approle/role/{}".format(approle)
-    role_cmd = "vault read -format=yaml {0}".format(role + '/role-id')
+    role = 'auth/approle/role/' + approle
+    role_cmd = 'vault read -format=yaml ' + role + '/role-id'
 
     with hide('stdout'):
         role_id = yaml.load(run(role_cmd))['data']['role_id']
@@ -154,18 +148,12 @@ def secret_id(approle, token=None):
         raise StandardError("Invalid AppRole!")
 
     if token is None:
-        token = build_token()
+        token = get_build_token()
 
     auth_vault(token)
 
-    role = "auth/approle/role/{}".format(approle)
-    secret_cmd = [
-        'vault write',
-        '-wrap-ttl=5m',
-        '-format=yaml',
-        '-f',
-        role + '/secret-id',
-    ]
+    role = 'auth/approle/role/' + approle
+    secret_cmd = 'vault write -wrap-ttl=5m -format=yaml -f ' + role + '/secret-id'
 
     with hide('stdout'):
         token = yaml.load(run(string.join(secret_cmd)))['wrap_info']['token']
