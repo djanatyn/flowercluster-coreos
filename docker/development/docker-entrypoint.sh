@@ -15,7 +15,7 @@ fi
 
 # run ansible
 cd /var/local/ansible && sudo -u ansible git pull
-ansible-playbook -i hosts setup.yml --vault-password-file=/usr/sbin/vault_pass "$@"
+ansible-playbook -i hosts setup.yml --vault-password-file=/usr/sbin/vault_pass
 
 # supervisord
 exec /usr/bin/supervisord
