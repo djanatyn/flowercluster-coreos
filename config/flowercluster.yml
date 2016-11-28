@@ -85,7 +85,6 @@ systemd:
             Requires=var-lib-docker.mount
             Requires=clone-flowercluster.service
             Wants=gogs.service
-            Wants=development.service
     - name: gogs.service
       enable: True
       contents: |
