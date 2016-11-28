@@ -5,6 +5,11 @@ if [[ ! -f /root/vault_token ]]; then
   SECRET_TOKEN=$1
 
   /usr/bin/get-token $(/usr/bin/get-secret-id ${SECRET_TOKEN}) >/dev/null
+
+  if [[ $? != 0 ]]; then
+    echo "failed to get AppRole token!"
+    exit 1
+  fi
 fi
 
 # run ansible
