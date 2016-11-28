@@ -16,4 +16,7 @@ COPY supervisord.conf /etc/supervisord.conf
 
 RUN ssh-keygen -A
 
+# remove /run/nologin so PAM works
+RUN test -f /run/nologin && rm /run/nologin
+
 CMD ["/usr/bin/supervisord"]
