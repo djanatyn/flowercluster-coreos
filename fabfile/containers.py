@@ -28,14 +28,6 @@ def build(name):
         _run_build(config)
 
 
-@roles('flowercluster')
-@task
-def start():
-    """ Attempt to start all containers. """
-
-    for config in build_config:
-        if 'approle' in config:
-            secret_id = vault.secret_id(config['approle'])
 def _run_build(config):
     """ Run the docker command to build a container, using its configuration
     from config.yml.
