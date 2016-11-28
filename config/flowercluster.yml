@@ -61,7 +61,7 @@ systemd:
         Type=oneshot
         RemainAfterExit=yes
         ConditionPathExists=!/opt/flowercluster
-        ExecStart=/usr/bin/git clone -b feature/build-development https://github.com/djanatyn/flowercluster.git /opt/flowercluster
+        ExecStart=/usr/bin/git clone https://github.com/djanatyn/flowercluster.git /opt/flowercluster
     - name: vault.service
       enable: True
       contents: |
@@ -109,7 +109,6 @@ systemd:
         [Service]
         RestartSec=10s
         Restart=on-failure
-        ExecStartPre=-/usr/bin/docker run --name dev1 -v home-data:/home -p 22:22 flowercluster/development
         ExecStart=/usr/bin/docker start dev1
         ExecStop=/usr/bin/docker stop -t 2 dev1
     - name: haproxy.service
