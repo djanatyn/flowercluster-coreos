@@ -15,7 +15,5 @@ RUN git clone http://github.com/djanatyn/flowercluster-development /var/local/an
 RUN ansible-galaxy install -r /var/local/ansible/requirements.yml
 RUN chown -R ansible:ansible /var/local/ansible
 
-# RUN cd /var/local/ansible && ansible-playbook --vault-password-file=/root/vault_pass setup.yml && chmod a-rwx /root/vault_pass
-
 ADD ./docker-entrypoint.sh /usr/bin/docker-entrypoint
 ENTRYPOINT ["/usr/bin/docker-entrypoint"]
