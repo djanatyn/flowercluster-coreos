@@ -93,3 +93,20 @@ class Vault(object):
 
         for policy, path in vault['policies'].iteritems():
             self.update_policy(policy, path)
+
+    def secret_id(self, role):
+        """ Return a SecretID for an AppRole. """
+
+        logger.info("fetching SecretID for '{}'".format(role))
+
+        url = self.url('/auth/approle/role/' + role + '/secret-id')
+        headers = {'X-Vault-Wrap-TTL': vault['wrap_ttl']}
+        headers.update(self.header)
+
+        response = requests.post(url, headers=headers)
+
+        if response.status_code == 200:
+            return response.json()['data']['secret_id']
+        else:
+            logger.critical('failed to fetch SecretID: ' + response.text)
+            return None
