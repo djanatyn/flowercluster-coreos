@@ -13,15 +13,18 @@ logger.setLevel(logging.INFO)
 def start_container(configuration, secret_id=None):
     """ Start a container, passing in a SecretID wrap token if needed. """
 
-    logger.info("starting container '{0}' ({1})".format(configuration['name'], configuration['image']))
-    args = [
-        '/usr/bin/docker',
-        'run', configuration['image'],
-        '--name', configuration['name'],
-    ]
+    name = configuration['name']
+    image = configuration['image']
+
+    logger.info("starting container '{0}' ({1})".format(name, image))
+
+    args = ['/usr/bin/docker', 'run', '-d', '--name', name]
 
     if secret_id is not None:
         args.append(secret_id)
+
+    # container image name needs to come last!
+    args.append(image)
 
     return subprocess.call(args)
 
