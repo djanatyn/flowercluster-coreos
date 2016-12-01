@@ -1,12 +1,18 @@
 #!/usr/bin/env python
 
 import subprocess
+import logging
+
 from config import images, containers
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 def start_container(configuration, secret_id=None):
     """ Start a container, passing in a SecretID wrap token if needed. """
 
+    logger.log("starting container '{0}' ({1})".format(configuration['name'], configuration['image']))
     args = [
         '/usr/bin/docker',
         'run', configuration['image'],
@@ -22,6 +28,7 @@ def start_container(configuration, secret_id=None):
 def build_container(configuration, role_id=None):
     """ Build a container. Returns exit code. """
 
+    logger.log("building image '{}'".format(configuration['image']))
     args = ['/usr/bin/docker', 'build', configuration['path'], '-t', configuration['image']]
 
     if role_id is not None:
