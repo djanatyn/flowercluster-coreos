@@ -10,3 +10,23 @@ containers:
 - name: 'flowercluster/development'
   path: 'docker/development'
   approle: 'ansible'
+
+# vault configuration
+vault:
+  url: 'http://flowercluster:8200/'
+  policies:
+    build-token: '/opt/flowercluster/policies/build-token.hcl'
+  approles:
+    defaults:
+      secret_id_ttl: '10m'
+      token_ttl: '10m'
+      secret_id_num_uses: '1'
+    ansible:
+      path: '/opt/flowercluster/policies/ansible.hcl'
+      policies: 'ansible'
+      token_ttl: '24h'
+      token_max_ttl: '168h'
+      renewable: 'true'
+  build-token:
+    ttl: '10m'
+    renewable: 'false'
