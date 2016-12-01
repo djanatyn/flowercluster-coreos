@@ -1,0 +1,5 @@
+#!/bin/bash
+
+DOCKER_DIR=/var/local/flowercluster/docker/flowercluster-init
+
+cd $DOCKER_DIR && docker build . -t flowercluster/init
