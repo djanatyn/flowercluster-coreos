@@ -45,7 +45,12 @@ class Vault(object):
         with open(join(checkout, path), 'r') as f:
             data = {'rules': f.read()}
 
-        return requests.post(url, json=data, headers=self.header)
+        response = requests.post(url, json=data, headers=self.header)
+
+        if response.status_code != 200:
+            logger.critical('Policy update failed: ' + response.text)
+
+        return response
 
     def update_approle(self, role, config):
         """ Create or update an existing AppRole. Uses default arguments. """
@@ -63,7 +68,12 @@ class Vault(object):
         data.update(defaults)
         data.update(config)
 
-        return requests.post(url, json=data, headers=self.header)
+        response = requests.post(url, json=data, headers=self.header)
+
+        if response.status_code != 200:
+            logger.critical('AppRole update failed: ' + response.text)
+
+        return response
 
     def update_approles(self):
         """ Update all Vault AppRoles in configuration. """
