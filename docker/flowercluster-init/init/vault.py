@@ -47,7 +47,7 @@ class Vault(object):
 
         response = requests.post(url, json=data, headers=self.header)
 
-        if response.status_code != 200:
+        if response.status_code != 204:
             logger.critical('Policy update failed: ' + response.text)
 
         return response
@@ -70,7 +70,7 @@ class Vault(object):
 
         response = requests.post(url, json=data, headers=self.header)
 
-        if response.status_code != 200:
+        if response.status_code != 204:
             logger.critical('AppRole update failed: ' + response.text)
 
         return response
