@@ -20,6 +20,7 @@ def main():
     vault = Vault(args.token)
     if args.policy:
         vault.update_policies()
+        vault.update_approles()
 
 if __name__ == '__main__':
     main()

@@ -47,6 +47,37 @@ class Vault(object):
 
         return requests.post(url, json=data, headers=self.header)
 
+    def update_approle(self, role, config):
+        """ Create or update an existing AppRole. Uses default arguments. """
+
+        logger.info("updating AppRole '{}'".format(role))
+
+        defaults = vault['approles']['defaults']
+
+        url = self.url('/auth/approle/role/' + role)
+        data = {
+            'role_name': role,
+            'policies': role,
+        }
+
+        data.update(defaults)
+        data.update(config)
+
+        return requests.post(url, json=data, headers=self.header)
+
+    def update_approles(self):
+        """ Update all Vault AppRoles in configuration. """
+
+        for role, role_config in vault['approles'].iteritems():
+            if role == 'defaults':
+                continue
+
+            # create associated policy
+            self.update_policy(role, role_config['path'])
+
+            # create AppRole
+            self.update_approle(role, role_config['config'])
+
     def update_policies(self):
         """ Update all Vault policies in configuration. """
 
