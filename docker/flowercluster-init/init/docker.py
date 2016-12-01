@@ -2,8 +2,9 @@
 
 import subprocess
 import logging
+import os
 
-from config import images, containers
+from config import images, containers, checkout
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -29,10 +30,12 @@ def build_container(configuration, role_id=None):
     """ Build a container. Returns exit code. """
 
     logger.info("building image '{}'".format(configuration['image']))
-    args = ['/usr/bin/docker', 'build', configuration['path'], '-t', configuration['image']]
+
+    path = os.path.join(checkout, configuration['path'])
+    args = ['/usr/bin/docker', 'build', path, '-t', configuration['image']]
 
     if role_id is not None:
-        args.append('--build-arg ROLE_ID=' + role_id)
+        args += ['--build-arg', 'ROLE_ID=' + role_id]
 
     return subprocess.call(args)
 
