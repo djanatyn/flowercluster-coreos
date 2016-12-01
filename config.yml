@@ -1,15 +1,20 @@
 ---
 git-checkout: '/var/local/flowercluster/'
-containers:
-- name: 'flowercluster/init'
+images:
+- image: 'flowercluster/init'
   path: 'docker/flowercluster-init'
-- name: 'flowercluster/haproxy'
+- image: 'flowercluster/haproxy'
   path: 'docker/flowercluster-haproxy'
-- name: 'flowercluster/fedora-ansible'
+- image: 'flowercluster/fedora-ansible'
   path: 'docker/fedora-ansible'
-- name: 'flowercluster/development'
+- image: 'flowercluster/development'
   path: 'docker/development'
   approle: 'ansible'
+containers:
+- name: 'dev1'
+  image: 'flowercluster/development'
+  approle: 'ansible'
+
 
 # vault configuration
 vault:
