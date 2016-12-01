@@ -1,0 +1,12 @@
+---
+git-checkout: '/opt/flowercluster/'
+containers:
+- name: 'flowercluster/init'
+  path: 'docker/flowercluster-init'
+- name: 'flowercluster/haproxy'
+  path: 'docker/flowercluster-haproxy'
+- name: 'flowercluster/fedora-ansible'
+  path: 'docker/fedora-ansible'
+- name: 'flowercluster/development'
+  path: 'docker/development'
+  approle: 'ansible'
