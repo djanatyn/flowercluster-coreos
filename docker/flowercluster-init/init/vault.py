@@ -110,3 +110,17 @@ class Vault(object):
         else:
             logger.critical('failed to fetch SecretID: ' + response.text)
             return None
+
+    def role_id(self, role):
+        """ Return a RoleID for an AppRole. """
+
+        logger.info("fetching RoleID for '{}'".format(role))
+
+        url = self.url('/auth/approle/role/' + role + '/role-id')
+        response = requests.get(url, headers=self.header)
+
+        if response.status_code == 200:
+            return response.json()['data']['role_id']
+        else:
+            logger.critical('failed to fetch RoleID: ' + response.text)
+            return None
