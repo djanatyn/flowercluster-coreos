@@ -106,9 +106,9 @@ class Vault(object):
         response = requests.post(url, headers=headers)
 
         if response.status_code == 200:
-            return response.json()['data']['secret_id']
+            return response.json()['wrap_info']['token']
         else:
-            logger.critical('failed to fetch SecretID: ' + response.text)
+            logger.critical('failed to fetch SecretID Wrap Token: ' + response.text)
             return None
 
     def role_id(self, role):
