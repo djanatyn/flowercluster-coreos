@@ -1,7 +1,8 @@
-path "auth/approle/role/ansible/secret-id" {
+# we need to create approles + policies
+path "auth/approle/role/*" {
   policy = "write"
 }
 
-path "auth/approle/role/ansible/role-id" {
-  policy = "read"
+path "sys/policy/*" {
+  policy = "write"
 }
