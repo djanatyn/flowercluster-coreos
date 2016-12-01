@@ -2,7 +2,7 @@
 
 import argparse
 from init.vault import Vault
-from docker import initialize
+from init.docker import initialize
 
 
 def parse_args():
