@@ -7,5 +7,5 @@
 docker run --rm \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v /usr/bin/docker:/usr/bin/docker \
-  -v /opt/flowercluster/config.yml:/var/local/config.yml \
+  -v /opt/flowercluster:/var/local/flowercluster \
   flowercluster/init "$@"

@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 
-import requests
 import logging
+
+import vault
 
 log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 logging.basicConfig(format=log_format)
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
-__all__ = []
+__all__ = ['vault']
