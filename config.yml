@@ -1,5 +1,5 @@
 ---
-git-checkout: '/var/local/flowercluster'
+git-checkout: '/var/local/flowercluster/'
 containers:
 - name: 'flowercluster/init'
   path: 'docker/flowercluster-init'
@@ -13,7 +13,7 @@ containers:
 
 # vault configuration
 vault:
-  url: 'http://flowercluster:8200/'
+  url: 'http://flowercluster:8200/v1'
   policies:
     build-token: 'policies/build-token.hcl'
   approles:
@@ -22,7 +22,7 @@ vault:
       token_ttl: '10m'
       secret_id_num_uses: '1'
     ansible:
-      path: '/opt/flowercluster/policies/ansible.hcl'
+      path: 'policies/ansible.hcl'
       policies: 'ansible'
       token_ttl: '24h'
       token_max_ttl: '168h'
