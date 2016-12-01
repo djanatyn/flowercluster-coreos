@@ -20,11 +20,12 @@ def start_container(configuration, secret_id=None):
 
     args = ['/usr/bin/docker', 'run', '-d', '--name', name]
 
+    # container image name needs to come after flags
+    args.append(image)
+
+    # and if there's a secret id, it's an argument for the entrypoint
     if secret_id is not None:
         args.append(secret_id)
-
-    # container image name needs to come last!
-    args.append(image)
 
     return subprocess.call(args)
 
