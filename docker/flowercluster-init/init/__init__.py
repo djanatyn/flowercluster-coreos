@@ -33,7 +33,7 @@ def build_images(token=None):
         validate_token(token, vault_url)
 
     images = load_images(approles, token=token)
-    for name, image in images.iteritems():
+    for image in images:
         image.build()
 
 
@@ -44,5 +44,5 @@ def start_containers(token=None):
         validate_token(token, vault_url)
 
     containers = load_containers(approles, token=token)
-    for name, container in containers.iteritems():
+    for container in containers:
         container.start()

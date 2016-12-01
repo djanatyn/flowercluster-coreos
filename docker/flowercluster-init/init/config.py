@@ -64,7 +64,7 @@ def load_images(approles, token=None):
     This must be run after collecting AppRoles, as we fetch (dynamic) RoleIDs!
     """
 
-    images = {}
+    images = []
 
     for image in config['images']:
         image_name = image['image']
@@ -76,7 +76,7 @@ def load_images(approles, token=None):
             approle = lookup_approle(approles, image['role_id'])
             role_id = approle.role_id(token, vault_url)
 
-        images[image_name] = Image(image_name, path, role_id=role_id)
+        images.append(Image(image_name, path, role_id=role_id))
 
     return images
 
@@ -87,7 +87,7 @@ def load_containers(approles, token=None):
     This must be run after collecting AppRoles, as we fetch (dynamic) SecretIDs!
     """
 
-    containers = {}
+    containers = []
 
     for container in config['containers']:
         name = container['name']
@@ -98,8 +98,13 @@ def load_containers(approles, token=None):
             approle = lookup_approle(approles, container['secret_id'])
             wrap_token = approle.wrapped_secret_id(token, vault_url)
 
-        network = container.get('network')
+        params = {
+            'network': container.get('network'),
+            'volumes': container.get('volumes'),
+            'ports': container.get('ports'),
+            'token': wrap_token,
+        }
 
-        containers[name] = Container(name, image, token=wrap_token, network=network)
+        containers.append(Container(name, image, **params))
 
     return containers

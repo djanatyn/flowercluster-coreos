@@ -34,9 +34,27 @@ images:
 - image: 'flowercluster/development'
   path: 'docker/development'
   role_id: 'ansible'
+- image: 'flowercluster/haproxy'
+  path: 'docker/flowercluster-haproxy'
 
 containers:
 - name: 'dev1'
   image: 'flowercluster/development'
   secret_id: 'ansible'
   network: 'host'
+- name: 'owncloud1'
+  image: 'flowercluster/owncloud'
+  network: 'web'
+  volumes:
+  - 'owncloud-data:/var/www/html'
+- name: 'gogs1'
+  image: 'flowercluster/gogs'
+  network: 'web'
+  volumes:
+  - 'gogs-data:/data'
+- name: 'haproxy1'
+  image: 'flowercluster/haproxy'
+  network: 'web'
+  ports:
+  - '1234:1234'
+  - '80:80'

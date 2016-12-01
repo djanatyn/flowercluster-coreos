@@ -31,11 +31,13 @@ class Image(object):
 class Container(object):
     """ A docker containers to be started. """
 
-    def __init__(self, name, image, token=None, network=None):
+    def __init__(self, name, image, token=None, network=None, volumes=None, ports=None):
         self.name = name
         self.image = image
         self.token = token
         self.network = network
+        self.volumes = volumes
+        self.ports = ports
 
     def start(self):
         """ Start the container, passing in a SecretID wrap token if needed. """
@@ -43,8 +45,17 @@ class Container(object):
         logger.info("starting container '{0}' ({1})".format(self.name, self.image))
 
         args = ['/usr/bin/docker', 'run', '-d', '--name', self.name]
+
         if self.network is not None:
             args += ['--network', self.network]
+
+        if self.volumes is not None:
+            for volume in self.volumes:
+                args += ['-v', volume]
+
+        if self.ports is not None:
+            for port in self.ports:
+                args += ['-p', port]
 
         # container image name needs to come after flags
         args.append(self.image)
