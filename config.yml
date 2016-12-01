@@ -31,3 +31,4 @@ vault:
   build-token:
     ttl: '10m'
     renewable: 'false'
+  wrap_ttl: '10m'
