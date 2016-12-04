@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-def start_container(configuration, secret_id=None):
+def start_container(configuration, secret_id=None, network=None):
     """ Start a container, passing in a SecretID wrap token if needed. """
 
     name = configuration['name']
@@ -19,6 +19,9 @@ def start_container(configuration, secret_id=None):
     logger.info("starting container '{0}' ({1})".format(name, image))
 
     args = ['/usr/bin/docker', 'run', '-d', '--name', name]
+
+    if network is not None:
+        args += ['--network', network]
 
     # container image name needs to come after flags
     args.append(image)
@@ -55,8 +58,13 @@ def initialize(vault_instance):
         build_container(image, role_id=role_id)
 
     for container in containers:
-        secret_id = None
-        if 'approle' in container:
-            secret_id = vault_instance.secret_id(container['approle'])
+        run_args = {
+            'secret_id': None,
+            'network': None,
+        }
 
-        start_container(container, secret_id=secret_id)
+        for arg in run_args.keys():
+            if arg in container:
+                run_args[arg] = container[arg]
+
+        start_container(container, **run_args)

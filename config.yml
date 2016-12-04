@@ -14,7 +14,7 @@ containers:
 - name: 'dev1'
   image: 'flowercluster/development'
   approle: 'ansible'
-
+  network: 'host'
 
 # vault configuration
 vault:
