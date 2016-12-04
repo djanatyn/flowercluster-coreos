@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# update git repository
+(cd /var/local/flowercluster && sudo git pull)
+
+# run flowercluster/init
+docker run --rm \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v /usr/bin/docker:/usr/bin/docker \
+  -v /var/local/flowercluster:/var/local/flowercluster \
+  flowercluster/init "$@"

@@ -1,0 +1,42 @@
+---
+git-checkout: '/var/local/flowercluster/'
+
+vault:
+  url: 'http://flowercluster:8200/v1'
+  secret_id_wrap_ttl: '10m'
+
+  policies:
+  - name: 'build-token'
+    path: 'policies/build-token.hcl'
+  - name: 'ansible'
+    path: 'policies/ansible.hcl'
+
+  approle_defaults:
+    secret_id_ttl: '10m'
+    token_ttl: '10m'
+    secret_id_num_uses: '1'
+
+  approles:
+  - name: 'ansible'
+    args:
+      policies: 'ansible'
+      token_ttl: '24h'
+      token_max_ttl: '168h'
+      renewable: 'true'
+
+images:
+- image: 'flowercluster/init'
+  path: 'docker/flowercluster-init'
+- image: 'flowercluster/haproxy'
+  path: 'docker/flowercluster-haproxy'
+- image: 'flowercluster/fedora-ansible'
+  path: 'docker/fedora-ansible'
+- image: 'flowercluster/development'
+  path: 'docker/development'
+  role_id: 'ansible'
+
+containers:
+- name: 'dev1'
+  image: 'flowercluster/development'
+  secret_id: 'ansible'
+  network: 'host'

@@ -1,8 +1,0 @@
-#!/bin/bash
-
-sudo mkdir /var/lib/docker/volumes/registry-certs/_data/certs
-
-sudo openssl req -x509 -newkey rsa:2048 -keyout /var/lib/docker/volumes/registry-certs/_data/domain.key -out /var/lib/docker/volumes/registry-certs/_data/domain.crt -days 365 -subj '/CN=stable' -nodes
-
-echo "add this new cert to the configuration for all instances:"
-sudo cat /var/lib/docker/volumes/registry-certs/_data/domain.crt
