@@ -1,5 +1,11 @@
 ---
+# absolute path of git repository checkout 
 git-checkout: '/var/local/flowercluster/'
+
+# containers to build
+#   image: tag for image
+#   path: relative path to Dockerfile
+#   approle: bake the RoleID for that AppRole into the image
 images:
 - image: 'flowercluster/init'
   path: 'docker/flowercluster-init'
@@ -10,13 +16,17 @@ images:
 - image: 'flowercluster/development'
   path: 'docker/development'
   approle: 'ansible'
+
+# containers to start
+#   name: name of container
+#   secret_id: AppRole to fetch SecretID for (if not specified, no SecretID is passed)
+#   network: network to start container inside
 containers:
 - name: 'dev1'
   image: 'flowercluster/development'
-  approle: 'ansible'
+  secret_id: 'ansible'
   network: 'host'
 
-# vault configuration
 vault:
   url: 'http://flowercluster:8200/v1'
   policies:
