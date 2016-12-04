@@ -1,11 +1,29 @@
 ---
-# absolute path of git repository checkout 
 git-checkout: '/var/local/flowercluster/'
 
-# containers to build
-#   image: tag for image
-#   path: relative path to Dockerfile
-#   approle: bake the RoleID for that AppRole into the image
+vault:
+  url: 'http://flowercluster:8200/v1'
+  secret_id_wrap_ttl: '10m'
+
+  policies:
+  - name: 'build-token'
+    path: 'policies/build-token.hcl'
+  - name: 'ansible'
+    path: 'policies/ansible.hcl'
+
+  approle_defaults:
+    secret_id_ttl: '10m'
+    token_ttl: '10m'
+    secret_id_num_uses: '1'
+
+  approles:
+  - name: 'ansible'
+    args:
+      policies: 'ansible'
+      token_ttl: '24h'
+      token_max_ttl: '168h'
+      renewable: 'true'
+
 images:
 - image: 'flowercluster/init'
   path: 'docker/flowercluster-init'
@@ -15,35 +33,10 @@ images:
   path: 'docker/fedora-ansible'
 - image: 'flowercluster/development'
   path: 'docker/development'
-  approle: 'ansible'
+  role_id: 'ansible'
 
-# containers to start
-#   name: name of container
-#   secret_id: AppRole to fetch SecretID for (if not specified, no SecretID is passed)
-#   network: network to start container inside
 containers:
 - name: 'dev1'
   image: 'flowercluster/development'
   secret_id: 'ansible'
   network: 'host'
-
-vault:
-  url: 'http://flowercluster:8200/v1'
-  policies:
-    build-token: 'policies/build-token.hcl'
-  approles:
-    defaults:
-      secret_id_ttl: '10m'
-      token_ttl: '10m'
-      secret_id_num_uses: '1'
-    ansible:
-      path: 'policies/ansible.hcl'
-      config:
-        policies: 'ansible'
-        token_ttl: '24h'
-        token_max_ttl: '168h'
-        renewable: 'true'
-  build-token:
-    ttl: '10m'
-    renewable: 'false'
-  wrap_ttl: '10m'

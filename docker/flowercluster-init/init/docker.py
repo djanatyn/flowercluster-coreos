@@ -2,69 +2,55 @@
 
 import subprocess
 import logging
-import os
-
-from config import images, containers, checkout
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-def start_container(configuration, secret_id=None, network=None):
-    """ Start a container, passing in a SecretID wrap token if needed. """
+class Image(object):
+    """ A Docker image to be built. """
 
-    name = configuration['name']
-    image = configuration['image']
+    def __init__(self, name, path, role_id=None):
+        self.name = name
+        self.role_id = role_id
+        self.path = path
 
-    logger.info("starting container '{0}' ({1})".format(name, image))
+    def build(self):
+        """ Attempt to build the image. """
 
-    args = ['/usr/bin/docker', 'run', '-d', '--name', name]
+        logger.info("building image '{}'".format(self.name))
 
-    if network is not None:
-        args += ['--network', network]
+        args = ['/usr/bin/docker', 'build', self.path, '-t', self.name]
 
-    # container image name needs to come after flags
-    args.append(image)
+        if self.role_id is not None:
+            args += ['--build-arg', 'ROLE_ID=' + self.role_id]
 
-    # and if there's a secret id, it's an argument for the entrypoint
-    if secret_id is not None:
-        args.append(secret_id)
-
-    return subprocess.call(args)
+        return subprocess.call(args)
 
 
-def build_container(configuration, role_id=None):
-    """ Build a container. Returns exit code. """
+class Container(object):
+    """ A docker containers to be started. """
 
-    logger.info("building image '{}'".format(configuration['image']))
+    def __init__(self, name, image, token=None, network=None):
+        self.name = name
+        self.image = image
+        self.token = token
+        self.network = network
 
-    path = os.path.join(checkout, configuration['path'])
-    args = ['/usr/bin/docker', 'build', path, '-t', configuration['image']]
+    def start(self):
+        """ Start the container, passing in a SecretID wrap token if needed. """
 
-    if role_id is not None:
-        args += ['--build-arg', 'ROLE_ID=' + role_id]
+        logger.info("starting container '{0}' ({1})".format(self.name, self.image))
 
-    return subprocess.call(args)
+        args = ['/usr/bin/docker', 'run', '-d', '--name', self.name]
+        if self.network is not None:
+            args += ['--network', self.network]
 
+        # container image name needs to come after flags
+        args.append(self.image)
 
-def initialize(vault_instance):
-    """ Build and start all containers. """
+        # and if there's a secret id, it's an argument for the entrypoint
+        if self.token is not None:
+            args.append(self.token)
 
-    for image in images:
-        role_id = None
-        if 'approle' in image:
-            role_id = vault_instance.role_id(image['approle'])
-
-        build_container(image, role_id=role_id)
-
-    for container in containers:
-        run_args = {
-            'secret_id': None,
-            'network': None,
-        }
-
-        for arg in run_args.keys():
-            if arg in container:
-                run_args[arg] = container[arg]
-
-        start_container(container, **run_args)
+        return subprocess.call(args)
