@@ -10,7 +10,11 @@ if [[ ! -f /root/vault_token ]]; then
   fi
 
   SECRET_TOKEN=$1
-  exec /usr/bin/get-token $(/usr/bin/get-secret-id ${SECRET_TOKEN})
+  /usr/bin/get-token $(/usr/bin/get-secret-id ${SECRET_TOKEN})
+
+  if [[ $? -ne 0 ]]; then
+    exit 1
+  fi
 fi
 
 # run ansible
